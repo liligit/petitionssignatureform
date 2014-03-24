@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the Petitions Signature Form
+ * module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function petitionssignatureform_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  if ($phase === 'runtime') {
+    // Test for the presence of the Petitions PHP SDK.
+    $library = libraries_load(PETITIONSSIGNATUREFORM_SDK);
+    if (!empty($library['installed'])) {
+      $value = l($library['version'], 'https://github.com/WhiteHouse/petitions-php-sdk/releases');
+      $description = $t('Installed at !path.', array(
+        '!path' => libraries_get_path(PETITIONSSIGNATUREFORM_SDK),
+      ));
+      $severity = REQUIREMENT_OK;
+    }
+    // The SDK is missing.
+    else {
+      $value = $t('Missing');
+      $description = $t('Install the Petitions PHP SDK according to the instructions in the petitionssignatureform module <a href="!url">README.txt</a>.', array(
+        '!url' => url(drupal_get_path('module', 'petitionssignatureform') . '/README.txt'),
+      ));
+      $severity = REQUIREMENT_ERROR;
+    }
+
+    $requirements[PETITIONSSIGNATUREFORM_SDK] = array(
+      'title' => $t('Petitions PHP SDK'),
+      'value' => $value,
+      'description' => $description,
+      'severity' => $severity,
+    );
+  }
+
+  return $requirements;
+}

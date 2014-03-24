@@ -1,4 +1,5 @@
 name = Petitions Signature Form
-description = Provides a form for signing <a href="https://drupal.org/project/petitions">petitions</a>.
+description = Provides a form for signing petitions.
 core = 7.x
+dependencies[] = libraries (>=2.x)
 package = Petitions

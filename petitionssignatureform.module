@@ -4,3 +4,27 @@
  * @file
  * Provides a form for signing petitions.
  */
+
+/**
+ * The machine name of the Petitions PHP SDK library.
+ */
+define('PETITIONSSIGNATUREFORM_SDK', 'petitions-php-sdk');
+
+/**
+ * Implements hook_libraries_info().
+ */
+function petitionssignatureform_libraries_info() {
+  $libraries[PETITIONSSIGNATUREFORM_SDK] = array(
+    'name' => 'Petitions PHP SDK',
+    'vendor url' => 'https://github.com/WhiteHouse/petitions-php-sdk',
+    'download url' => 'https://github.com/WhiteHouse/petitions-php-sdk/releases',
+    'version arguments' => array(
+      'file' => 'petitions_php_sdk.php',
+      'pattern' => '/@version ([\d\.]+)/',
+    ),
+    'files' => array(
+      'php' => array('petitions_php_sdk.php'),
+    ),
+  );
+  return $libraries;
+}
