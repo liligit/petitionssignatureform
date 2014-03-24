@@ -28,3 +28,32 @@ function petitionssignatureform_libraries_info() {
   );
   return $libraries;
 }
+
+/**
+ * Implements hook_menu().
+ */
+function petitionssignatureform_menu() {
+  $items = array();
+
+  $items['admin/config/services/petitionssignatureform'] = array(
+    'title' => 'Petitions Signature Form',
+    'description' => 'Configure petitions signature forms.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('petitionssignatureform_admin_settings_form'),
+    'access arguments' => array('administer petitionssignatureform'),
+    'file' => 'petitionssignatureform.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function petitionssignatureform_permission() {
+  return array(
+    'administer petitionssignatureform' => array(
+      'title' => t('Administer Petitions Signature Form'),
+    ),
+  );
+}

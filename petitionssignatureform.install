@@ -42,3 +42,14 @@ function petitionssignatureform_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function petitionssignatureform_uninstall() {
+  // Delete ALL Petitions Signature Form persistent variables.
+  db_delete('variable')
+    ->condition('name', 'petitionssignatureform_%', 'LIKE')
+    ->execute();
+  cache_clear_all('variables', 'cache_bootstrap');
+}
