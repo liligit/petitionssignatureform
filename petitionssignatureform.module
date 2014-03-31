@@ -134,4 +134,32 @@ function petitionssignatureform_signature_form_validate($form, &$form_state) {
  * @see petitionssignatureform_signature_form()
  */
 function petitionssignatureform_signature_form_submit($form, &$form_state) {
+  $base = variable_get('petitionssignatureform_api_endpoint');
+  $key = variable_get('petitionssignatureform_api_key');
+  try {
+    libraries_load(PETITIONSSIGNATUREFORM_SDK);
+    $connector = new PetitionsPhpSdkApiConnector($base, $key);
+
+    $signature = array(
+      'petition_id' => check_plain($form_state['values']['petition_id']),
+      'first_name' => check_plain($form_state['values']['first_name']),
+      'last_name' => check_plain($form_state['values']['last_name']),
+      'zip' => check_plain($form_state['values']['zip_code']),
+      'email' => check_plain($form_state['values']['email']),
+      'signup' => $form_state['values']['sign_up'],
+    );
+
+    drupal_set_message(t('Your signature has been submitted.'));
+  }
+  catch (PetitionsPhpSdkConnectionException $e) {
+    drupal_set_message(t('Your signature could not be submitted. Unable to connect to !url. Please contact a site administrator.', array(
+      '!url' => $base,
+    )), 'error');
+  }
+  catch (PetitionsPhpSdkResponseServerException $e) {
+    // @todo Handle this.
+  }
+  catch (Exception $e) {
+    drupal_set_message(t('Your signature could not be submitted. Please contact a site administrator.'), 'error');
+  }
 }
