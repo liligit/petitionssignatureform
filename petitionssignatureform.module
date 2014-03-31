@@ -78,6 +78,10 @@ function petitionssignatureform_permission() {
  * Form constructor for the petitions signature form.
  */
 function petitionssignatureform_signature_form() {
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
+  );
+
   $form['petition_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Petition ID'),
