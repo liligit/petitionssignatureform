@@ -38,10 +38,26 @@ function petitionssignatureform_menu() {
   $items['admin/config/services/petitionssignatureform'] = array(
     'title' => 'Petitions Signature Form',
     'description' => 'Configure petitions signature forms.',
+    'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('petitionssignatureform_admin_settings_form'),
     'access arguments' => array('administer petitionssignatureform'),
     'file' => 'petitionssignatureform.admin.inc',
+  );
+
+  $items['admin/config/services/petitionssignatureform/configure'] = array(
+    'title' => 'Configure',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['admin/config/services/petitionssignatureform/test'] = array(
+    'title' => 'Test',
+    'description' => 'Test petitions signature form submission.',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('petitionssignatureform_signature_form'),
+    'access arguments' => array('administer petitionssignatureform'),
   );
 
   return $items;
@@ -56,4 +72,66 @@ function petitionssignatureform_permission() {
       'title' => t('Administer Petitions Signature Form'),
     ),
   );
+}
+
+/**
+ * Form constructor for the petitions signature form.
+ */
+function petitionssignatureform_signature_form() {
+  $form['petition_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Petition ID'),
+    '#required' => TRUE,
+  );
+
+  $form['first_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First Name'),
+  );
+  $form['last_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Last Name'),
+  );
+  $form['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email Address'),
+    '#required' => TRUE,
+  );
+  $form['zip_code'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Zip Code'),
+    '#size' => 10,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Sign Now'),
+  );
+
+  $form['sign_up'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Sign up for Updates'),
+  );
+
+  return $form;
+}
+
+/**
+ * Form validation handler for petitionssignatureform_signature_form().
+ *
+ * @see petitionssignatureform_signature_form()
+ */
+function petitionssignatureform_signature_form_validate($form, &$form_state) {
+  // Validate email address.
+  if (!valid_email_address($form_state['values']['email'])) {
+    form_set_error('email', 'Please enter a valid email address.');
+  }
+}
+
+/**
+ * Form submission handler for petitionssignatureform_signature_form().
+ *
+ * @see petitionssignatureform_signature_form()
+ */
+function petitionssignatureform_signature_form_submit($form, &$form_state) {
 }
