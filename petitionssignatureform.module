@@ -153,16 +153,21 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
       'signup' => $form_state['values']['sign_up'],
     );
 
+    $response = $connector->sendSignature($signature);
     drupal_set_message(t('Your signature has been submitted.'));
   }
+  // A connection exception usually signifies a problem with the local
+  // configuration.
   catch (PetitionsPhpSdkConnectionException $e) {
     drupal_set_message(t('Your signature could not be submitted. Unable to connect to !url. Please contact a site administrator.', array(
       '!url' => $base,
     )), 'error');
   }
+  // A server exception signifies a problem with the target petitions site.
   catch (PetitionsPhpSdkResponseServerException $e) {
-    // @todo Handle this.
+    drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
   }
+  // Most other errors signify a problem with the local configuration.
   catch (Exception $e) {
     drupal_set_message(t('Your signature could not be submitted. Please contact a site administrator.'), 'error');
   }
