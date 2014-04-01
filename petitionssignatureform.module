@@ -140,9 +140,10 @@ function petitionssignatureform_signature_form_validate($form, &$form_state) {
 function petitionssignatureform_signature_form_submit($form, &$form_state) {
   $base = variable_get('petitionssignatureform_api_endpoint');
   $key = variable_get('petitionssignatureform_api_key');
+  $allow_insecure = (bool) variable_get('petitionssignatureform_allow_insecure', FALSE);
   try {
     libraries_load(PETITIONSSIGNATUREFORM_SDK);
-    $connector = new PetitionsPhpSdkApiConnector($base, $key);
+    $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
 
     $signature = array(
       'petition_id' => check_plain($form_state['values']['petition_id']),

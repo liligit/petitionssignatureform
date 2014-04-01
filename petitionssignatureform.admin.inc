@@ -38,6 +38,14 @@ function petitionssignatureform_admin_settings_form() {
     '#default_value' => variable_get('petitionssignatureform_api_key'),
     '#required' => TRUE,
   );
+  $form['petitionssignatureform_allow_insecure'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow insecure SSL.'),
+    '#description' => t('Do not verify the peer or check for a common name in the peer certificate. Enable this to use SSL with a self-signed certificate, for example.<br /><strong>Warning:</strong> This setting has <a href="!url">security implications</a>. Do not enable it without understanding them.', array(
+      '!url' => 'http://php.net/manual/function.curl-setopt.php',
+    )),
+    '#default_value' => variable_get('petitionssignatureform_allow_insecure', 0),
+  );
   return system_settings_form($form);
 }
 
