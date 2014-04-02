@@ -146,11 +146,11 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
     $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
 
     $signature = array(
-      'petition_id' => check_plain($form_state['values']['petition_id']),
-      'first_name' => check_plain($form_state['values']['first_name']),
-      'last_name' => check_plain($form_state['values']['last_name']),
-      'zip' => check_plain($form_state['values']['zip_code']),
-      'email' => check_plain($form_state['values']['email']),
+      'petition_id' => $form_state['values']['petition_id'],
+      'first_name' => $form_state['values']['first_name'],
+      'last_name' => $form_state['values']['last_name'],
+      'zip' => $form_state['values']['zip_code'],
+      'email' => $form_state['values']['email'],
       'signup' => $form_state['values']['sign_up'],
     );
 
