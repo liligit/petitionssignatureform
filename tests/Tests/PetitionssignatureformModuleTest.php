@@ -5,7 +5,7 @@
  * Contains PetitionssignatureformModuleTest.
  */
 
-require_once __DIR__ . '/../../petitionssignatureform.module';
+require_once dirname(__FILE__) . '/../../petitionssignatureform.module';
 
 /**
  * Tests the functions in petitionssignatureform.module.

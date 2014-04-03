@@ -5,7 +5,7 @@
  * Provides a form for signing petitions.
  */
 
-require_once __DIR__ . '/lib/PetitionssignatureformException.php';
+require_once dirname(__FILE__) . '/lib/PetitionssignatureformException.php';
 
 /**
  * The machine name of the Petitions PHP SDK library.
