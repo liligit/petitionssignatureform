@@ -5,6 +5,8 @@
  * Provides a form for signing petitions.
  */
 
+require_once __DIR__ . '/lib/PetitionssignatureformException.php';
+
 /**
  * The machine name of the Petitions PHP SDK library.
  */
@@ -76,16 +78,29 @@ function petitionssignatureform_permission() {
 
 /**
  * Form constructor for the petitions signature form.
+ *
+ * @param string $petition_id
+ *   (optional) The ID of a petition to send the signature to. If supplied, the
+ *   "Petition ID" field will be auto-filled and hidden from the end user.
+ *
+ * @throws PetitionssignatureformException
+ *   If an invalid petition ID is supplied.
  */
-function petitionssignatureform_signature_form() {
+function petitionssignatureform_signature_form($form, &$form_state, $petition_id = NULL) {
+  // Make sure the petition ID is valid if supplied.
+  if (isset($petition_id) && (!is_string($petition_id) || !strlen($petition_id))) {
+    throw new PetitionssignatureformException('Invalid Petition ID.');
+  }
+
   $form['#attached']['js'] = array(
     drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
   );
 
   $form['petition_id'] = array(
-    '#type' => 'textfield',
+    '#type' => (isset($petition_id)) ? 'hidden' : 'textfield',
     '#title' => t('Petition ID'),
     '#required' => TRUE,
+    '#default_value' => (isset($petition_id)) ? $petition_id : '',
   );
 
   $form['first_name'] = array(
