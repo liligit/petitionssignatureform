@@ -106,10 +106,12 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
   $form['first_name'] = array(
     '#type' => 'textfield',
     '#title' => t('First Name'),
+    '#required' => TRUE,
   );
   $form['last_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Last Name'),
+    '#required' => TRUE,
   );
   $form['email'] = array(
     '#type' => 'textfield',
