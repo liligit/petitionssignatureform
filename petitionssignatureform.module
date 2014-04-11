@@ -13,6 +13,26 @@ require_once dirname(__FILE__) . '/lib/PetitionssignatureformException.php';
 define('PETITIONSSIGNATUREFORM_SDK', 'petitions-php-sdk');
 
 /**
+ * The block form argument method none.
+ */
+define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE', 0);
+
+/**
+ * The block form argument method id.
+ */
+define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID', 1);
+
+/**
+ * The block form argument method path.
+ */
+define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH', 2);
+
+/**
+ * The block form argument location path.
+ */
+define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH', 0);
+
+/**
  * Implements hook_libraries_info().
  */
 function petitionssignatureform_libraries_info() {
@@ -188,4 +208,169 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
       '!exception' => print_r($e, TRUE),
     ), WATCHDOG_ERROR);
   }
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function petitionssignatureform_block_info() {
+  $blocks = array();
+
+  $blocks['petitionssignatureform_form'] = array(
+    'info' => t('Petitions signature form block'),
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function petitionssignatureform_block_configure($delta = '') {
+  $form = array();
+ 
+  switch($delta) {
+    case 'petitionssignatureform_form' :
+      // Argument method.
+      $form['form_petition_id_argument_type'] = array(
+        '#type' => 'select',
+        '#title' => t('Petition identifier to use'),
+        '#options' => array(
+          // @todo: allow the selection of the Petition ID option when ready to implement.
+          PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE => t('None'),
+          // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
+          PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH => t('Petition path'),
+        ),
+        '#default_value' => variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE),
+      );
+      // Argument location.
+      $form['form_petition_id_argument_location'] = array(
+        '#type' => 'select',
+        '#title' => t('Location of the Petition identifier'),
+        '#options' => array(
+          // @todo: allow the selection of the Petition arg() options when ready to implement.
+          PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH => t('Use complete path'),
+          // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
+        ),
+        '#default_value' => variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH),
+      );
+      // @todo: add a field to input the argument number, ajax-controlled by the location field.
+      // @todo: add a thermometer toggle to this form.
+      break;
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function petitionssignatureform_block_save($delta = '', $edit = array()) {
+  switch($delta) {
+    case 'petitionssignatureform_form' :
+      // Save the argument method.   
+      variable_set('petitionssignatureform_form_petition_id_argument_type', $edit['form_petition_id_argument_type']['value']);
+      // Save the argument location.
+      variable_set('petitionssignatureform_form_petition_id_argument_location', $edit['form_petition_id_argument_location']['value']);
+      // @todo: save pending settings here as they get implemented.
+      break;
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function petitionssignatureform_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'petitionssignatureform_form':
+      $block['subject'] = t('Sign this Petition');
+      $block['content'] = _petitionssignatureform_block_content();
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Block content generation function.
+ *
+ * @return content in rederable array format.
+ */
+function _petitionssignatureform_block_content() {
+  $petition_id = NULL;
+  $content = '';
+
+  // Get block settings.
+  $arg_type = variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE);
+  $arg_location = variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH);
+  // @todo: get settings here as they get implemented.
+
+  switch ($arg_type) {
+    case 0:
+      // @todo: Implement method None here.
+      break;
+    case 1:
+      // @todo: Implement method Id here.
+      break;
+    case 2:
+      // Get Petition ID from read api.
+      $petition_id = _petitionssignatureform_petition_id_from_api($arg_location);
+      break;
+    default:
+  }
+
+  $content = drupal_render(drupal_get_form('petitionssignatureform_signature_form', $petition_id));
+
+  return $content;
+}
+
+/**
+ * Retrieves Petition ID from API call.
+ *
+ * @param int $arg_location
+ *   The value from Drupal variable 'petitionssignatureform_form_petition_id_argument_location'
+ *
+ * @throws PetitionsPhpSdkResponseServerException
+ *   If there is an error reaching the API.
+ */
+function _petitionssignatureform_petition_id_from_api($arg_location) {
+  global $base_url;
+  $petition_url = NULL;
+
+  switch ($arg_location) {
+    case 0:
+      $petition_url = variable_get('petitions_data_petitions_website_url', $base_url) . '/' . $_GET['q'];
+      break;
+    case 1:
+      // @todo: implement grabbing the petition url from arg() here.
+      break;
+    default:
+  }
+
+  $base = variable_get('petitionssignatureform_api_endpoint');
+  $key = variable_get('petitionssignatureform_api_key');
+  $allow_insecure = (bool) variable_get('petitionssignatureform_allow_insecure', FALSE);
+
+  try {
+    libraries_load(PETITIONSSIGNATUREFORM_SDK);
+    $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
+    $response = $connector->getPetitions(1, 0, array('url' => $petition_url));
+    // Dig into the response to get the Petition ID.
+    return $response->results[0]->id;
+  }
+  // A server exception signifies a problem with the target petitions site.
+  catch (PetitionsPhpSdkResponseServerException $e) {
+    watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
+      '!exception' => print_r($e, TRUE),
+    ), WATCHDOG_ERROR);
+  }
+  // Most other errors signify a problem with the local configuration.
+  catch (Exception $e) {
+    watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
+      '!exception' => print_r($e, TRUE),
+    ), WATCHDOG_ERROR);
+  }
+
+  return;
 }
