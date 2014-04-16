@@ -5,8 +5,6 @@
  * Provides a form for signing petitions.
  */
 
-require_once dirname(__FILE__) . '/lib/PetitionssignatureformException.php';
-
 /**
  * The machine name of the Petitions PHP SDK library.
  */
@@ -103,13 +101,13 @@ function petitionssignatureform_permission() {
  *   (optional) The ID of a petition to send the signature to. If supplied, the
  *   "Petition ID" field will be auto-filled and hidden from the end user.
  *
- * @throws PetitionssignatureformException
+ * @throws InvalidArgumentException
  *   If an invalid petition ID is supplied.
  */
 function petitionssignatureform_signature_form($form, &$form_state, $petition_id = NULL) {
   // Make sure the petition ID is valid if supplied.
   if (isset($petition_id) && (!is_string($petition_id) || !strlen($petition_id))) {
-    throw new PetitionssignatureformException('Invalid Petition ID.');
+    throw new InvalidArgumentException('Invalid Petition ID.');
   }
 
   $form['#attached']['js'] = array(

@@ -22,7 +22,7 @@ class PetitionssignatureformModuleTest extends PHPUnit_Framework_TestCase {
    *
    * @dataProvider providerSignatureFormRejectsInvalidPetitionId
    *
-   * @expectedException PetitionssignatureformException
+   * @expectedException InvalidArgumentException
    *
    * @param mixed $petition_id
    *   An invalid petition ID value.
