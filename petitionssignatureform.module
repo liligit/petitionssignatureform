@@ -11,24 +11,29 @@
 define('PETITIONSSIGNATUREFORM_SDK', 'petitions-php-sdk');
 
 /**
- * The block form argument method none.
+ * Block form argument method: none.
  */
 define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE', 0);
 
 /**
- * The block form argument method id.
+ * Block form argument method: petition ID.
  */
 define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID', 1);
 
 /**
- * The block form argument method path.
+ * Block form argument method: path.
  */
 define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH', 2);
 
 /**
- * The block form argument location path.
+ * The block form argument location: path.
  */
 define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH', 0);
+
+/**
+ * The block form argument location: arg().
+ */
+define('PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_ARG', 1);
 
 /**
  * Implements hook_libraries_info().
@@ -215,7 +220,7 @@ function petitionssignatureform_block_info() {
   $blocks = array();
 
   $blocks['petitionssignatureform_form'] = array(
-    'info' => t('Petitions signature form block'),
+    'info' => t('Petitions signature form'),
   );
 
   return $blocks;
@@ -226,15 +231,15 @@ function petitionssignatureform_block_info() {
  */
 function petitionssignatureform_block_configure($delta = '') {
   $form = array();
- 
-  switch($delta) {
-    case 'petitionssignatureform_form' :
+
+  switch ($delta) {
+    case 'petitionssignatureform_form':
       // Argument method.
       $form['form_petition_id_argument_type'] = array(
         '#type' => 'select',
         '#title' => t('Petition identifier to use'),
         '#options' => array(
-          // @todo: allow the selection of the Petition ID option when ready to implement.
+          // @todo Allow the selection of the Petition ID option when ready to implement.
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE => t('None'),
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH => t('Petition path'),
@@ -246,14 +251,15 @@ function petitionssignatureform_block_configure($delta = '') {
         '#type' => 'select',
         '#title' => t('Location of the Petition identifier'),
         '#options' => array(
-          // @todo: allow the selection of the Petition arg() options when ready to implement.
+          // @todo Allow the selection of the Petition arg() options when ready to implement.
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH => t('Use complete path'),
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
         ),
         '#default_value' => variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH),
       );
-      // @todo: add a field to input the argument number, ajax-controlled by the location field.
-      // @todo: add a thermometer toggle to this form.
+      // @todo Add a field to input the argument number, AJAX-controlled by the
+      //   location field.
+      // @todo Add a thermometer toggle to this form.
       break;
   }
   return $form;
@@ -263,13 +269,13 @@ function petitionssignatureform_block_configure($delta = '') {
  * Implements hook_block_save().
  */
 function petitionssignatureform_block_save($delta = '', $edit = array()) {
-  switch($delta) {
-    case 'petitionssignatureform_form' :
-      // Save the argument method.   
+  switch ($delta) {
+    case 'petitionssignatureform_form':
+      // Save the argument method.
       variable_set('petitionssignatureform_form_petition_id_argument_type', $edit['form_petition_id_argument_type']['value']);
       // Save the argument location.
       variable_set('petitionssignatureform_form_petition_id_argument_location', $edit['form_petition_id_argument_location']['value']);
-      // @todo: save pending settings here as they get implemented.
+      // @todo Save pending settings here as they get implemented.
       break;
   }
 }
@@ -293,41 +299,41 @@ function petitionssignatureform_block_view($delta = '') {
 /**
  * Block content generation function.
  *
- * @return content in rederable array format.
+ * @return array
+ *   A renderable array.
  */
 function _petitionssignatureform_block_content() {
   $petition_id = NULL;
-  $content = '';
 
   // Get block settings.
   $arg_type = variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE);
   $arg_location = variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH);
-  // @todo: get settings here as they get implemented.
+  // @todo Get settings here as they get implemented.
 
   switch ($arg_type) {
-    case 0:
-      // @todo: Implement method None here.
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
+      // @todo Implement method ID here.
       break;
-    case 1:
-      // @todo: Implement method Id here.
-      break;
-    case 2:
-      // Get Petition ID from read api.
+
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH:
+      // Get petition ID from read API.
       $petition_id = _petitionssignatureform_petition_id_from_api($arg_location);
       break;
+
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
     default:
+      // No petition identifier.
   }
 
-  $content = drupal_render(drupal_get_form('petitionssignatureform_signature_form', $petition_id));
-
-  return $content;
+  return drupal_render(drupal_get_form('petitionssignatureform_signature_form', $petition_id));
 }
 
 /**
  * Retrieves Petition ID from API call.
  *
  * @param int $arg_location
- *   The value from Drupal variable 'petitionssignatureform_form_petition_id_argument_location'
+ *   The value from Drupal variable
+ *   'petitionssignatureform_form_petition_id_argument_location'.
  *
  * @throws PetitionsPhpSdkResponseServerException
  *   If there is an error reaching the API.
@@ -337,12 +343,14 @@ function _petitionssignatureform_petition_id_from_api($arg_location) {
   $petition_url = NULL;
 
   switch ($arg_location) {
-    case 0:
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH:
       $petition_url = variable_get('petitions_data_petitions_website_url', $base_url) . '/' . $_GET['q'];
       break;
-    case 1:
-      // @todo: implement grabbing the petition url from arg() here.
+
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_ARG:
+      // @todo Implement grabbing the petition url from arg() here.
       break;
+
     default:
   }
 
@@ -369,6 +377,4 @@ function _petitionssignatureform_petition_id_from_api($arg_location) {
       '!exception' => print_r($e, TRUE),
     ), WATCHDOG_ERROR);
   }
-
-  return;
 }
