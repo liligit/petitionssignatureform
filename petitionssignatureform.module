@@ -272,9 +272,9 @@ function petitionssignatureform_block_save($delta = '', $edit = array()) {
   switch ($delta) {
     case 'petitionssignatureform_form':
       // Save the argument method.
-      variable_set('petitionssignatureform_form_petition_id_argument_type', $edit['form_petition_id_argument_type']['value']);
+      variable_set('petitionssignatureform_form_petition_id_argument_type', $edit['form_petition_id_argument_type']);
       // Save the argument location.
-      variable_set('petitionssignatureform_form_petition_id_argument_location', $edit['form_petition_id_argument_location']['value']);
+      variable_set('petitionssignatureform_form_petition_id_argument_location', $edit['form_petition_id_argument_location']);
       // @todo Save pending settings here as they get implemented.
       break;
   }
@@ -306,8 +306,8 @@ function _petitionssignatureform_block_content() {
   $petition_id = NULL;
 
   // Get block settings.
-  $arg_type = variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE);
-  $arg_location = variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH);
+  $arg_type = (int) variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE);
+  $arg_location = (int) variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH);
   // @todo Get settings here as they get implemented.
 
   switch ($arg_type) {
@@ -325,7 +325,8 @@ function _petitionssignatureform_block_content() {
       // No petition identifier.
   }
 
-  return drupal_render(drupal_get_form('petitionssignatureform_signature_form', $petition_id));
+  $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
+  return drupal_render($form);
 }
 
 /**
@@ -363,15 +364,15 @@ function _petitionssignatureform_petition_id_from_api($arg_location) {
     $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
     $response = $connector->getPetitions(1, 0, array('url' => $petition_url));
     // Dig into the response to get the Petition ID.
-    return $response->results[0]->id;
+    if (!empty($response->results[0]->id)) {
+      return $response->results[0]->id;
+    }
+    else {
+      watchdog('petitionssignatureform', "Could not get a petition ID via the API.\n\nResponse: !response", array(
+        '!response' => print_r($response, TRUE),
+      ), WATCHDOG_ERROR);
+    }
   }
-  // A server exception signifies a problem with the target petitions site.
-  catch (PetitionsPhpSdkResponseServerException $e) {
-    watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
-    ), WATCHDOG_ERROR);
-  }
-  // Most other errors signify a problem with the local configuration.
   catch (Exception $e) {
     watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
       '!exception' => print_r($e, TRUE),
