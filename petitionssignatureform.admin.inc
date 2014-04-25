@@ -55,7 +55,7 @@ function petitionssignatureform_admin_settings_form() {
   );
   $form['petitionssignatureform_thank_you_message'] = array(
     '#type' => 'textarea',
-    '#title' => t('Thank you title'),
+    '#title' => t('Thank you message'),
     '#descritiption' => t('Title above thank you message to display upon signature submission'),
     '#default_value' => variable_get('petitionssignatureform_thank_you_message', ''),
   );

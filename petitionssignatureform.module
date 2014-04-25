@@ -177,16 +177,19 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
   return $form;
 }
 
+/**
+ * Ajax callback for thank you message.
+ *
+ * @see petitionssignatureform_signature_form()
+ */
 function petitionsignatureform_ajax_thank_you($form, $form_state) {
   $title = variable_get('petitionssignatureform_thank_you_title', t('Email verification required'));
   $message = variable_get('petitionssignatureform_thank_you_message', t('Thank you! Please check your email, and click the link there to validate.'));
-  
-  // @TODO replace this with a proper theme function.
-  $html = '';
-  $html .= '<h3>' . strtoupper($title) . '</h3>';
-  $html .= '<div>' . $message . '</div>';
 
-  return $html;
+  return theme('petitionssignatureform_thank_you', array(
+    'title' => check_plain($title),
+    'message' => check_plain($message),
+  ));
 }
 
 /**
@@ -240,6 +243,19 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
       '!exception' => print_r($e, TRUE),
     ), WATCHDOG_ERROR);
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function petitionssignatureform_theme() {
+  return array(
+    // Thank You message for form submission.
+    'petitionssignatureform_thank_you' => array(
+      'arguments' => array(),
+      'template' => 'templates/petitionssignatureform-thank-you',
+    ),
+  );
 }
 
 /**
