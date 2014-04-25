@@ -183,12 +183,12 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
  * @see petitionssignatureform_signature_form()
  */
 function petitionsignatureform_ajax_thank_you($form, $form_state) {
-  $title = variable_get('petitionssignatureform_thank_you_title', t('Email verification required'));
-  $message = variable_get('petitionssignatureform_thank_you_message', t('Thank you! Please check your email, and click the link there to validate.'));
+  $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
+  $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
 
   return theme('petitionssignatureform_thank_you', array(
     'title' => check_plain($title),
-    'message' => check_plain($message),
+    'message' => filter_xss_admin($message),
   ));
 }
 
@@ -210,9 +210,9 @@ function petitionssignatureform_signature_form_validate($form, &$form_state) {
  * @see petitionssignatureform_signature_form()
  */
 function petitionssignatureform_signature_form_submit($form, &$form_state) {
-  $base = variable_get('petitionssignatureform_api_endpoint');
-  $key = variable_get('petitionssignatureform_api_key');
-  $allow_insecure = (bool) variable_get('petitionssignatureform_allow_insecure', FALSE);
+  $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
+  $key = petitionssignatureform_variable_get('petitionssignatureform_api_key');
+  $allow_insecure = (bool) petitionssignatureform_variable_get('petitionssignatureform_allow_insecure');
   try {
     libraries_load(PETITIONSSIGNATUREFORM_SDK);
     $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
@@ -259,6 +259,42 @@ function petitionssignatureform_theme() {
 }
 
 /**
+ * Gets Petitions Signature Form variables with default values.
+ *
+ * @return array
+ *   An array of variable defaults. Each item has a key corresponding to the
+ *   variable name and a value of the corresponding variable's default value.
+ */
+function petitionssignatureform_variable_defaults() {
+  return array(
+    'petitionssignatureform_allow_insecure' => FALSE,
+    'petitionssignatureform_api_endpoint' => '',
+    'petitionssignatureform_api_key' => '',
+    'petitionssignatureform_form_petition_id_argument_location' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH,
+    'petitionssignatureform_form_petition_id_argument_type' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE,
+    'petitionssignatureform_thank_you_message' => t("<p>Watch your email for a message from us, then click on the link to confirm your signature.</p>"),
+    'petitionssignatureform_thank_you_title' => t('Email Verification Required'),
+  );
+}
+
+/**
+ * Gets a persistent variable, accounting for Petitions Signature Form defaults.
+ *
+ * @param string $name
+ *   The name of the variable to return.
+ *
+ * @return mixed
+ *   The value of the variable. Unserialization is taken care of as necessary.
+ *
+ * @see variable_get()
+ */
+function petitionssignatureform_variable_get($name) {
+  $all_defaults = petitionssignatureform_variable_defaults();
+  $default = (array_key_exists($name, $all_defaults)) ? $all_defaults[$name] : NULL;
+  return variable_get($name, $default);
+}
+
+/**
  * Implements hook_block_info().
  */
 function petitionssignatureform_block_info() {
@@ -289,7 +325,7 @@ function petitionssignatureform_block_configure($delta = '') {
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH => t('Petition path'),
         ),
-        '#default_value' => variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE),
+        '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_type'),
       );
       // Argument location.
       $form['form_petition_id_argument_location'] = array(
@@ -300,7 +336,7 @@ function petitionssignatureform_block_configure($delta = '') {
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH => t('Use complete path'),
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
         ),
-        '#default_value' => variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH),
+        '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_location'),
       );
       // @todo Add a field to input the argument number, AJAX-controlled by the
       //   location field.
@@ -351,8 +387,8 @@ function _petitionssignatureform_block_content() {
   $petition_id = NULL;
 
   // Get block settings.
-  $arg_type = (int) variable_get('petitionssignatureform_form_petition_id_argument_type', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE);
-  $arg_location = (int) variable_get('petitionssignatureform_form_petition_id_argument_location', PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH);
+  $arg_type = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_type');
+  $arg_location = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_location');
   // @todo Get settings here as they get implemented.
 
   switch ($arg_type) {
@@ -400,9 +436,9 @@ function _petitionssignatureform_petition_id_from_api($arg_location) {
     default:
   }
 
-  $base = variable_get('petitionssignatureform_api_endpoint');
-  $key = variable_get('petitionssignatureform_api_key');
-  $allow_insecure = (bool) variable_get('petitionssignatureform_allow_insecure', FALSE);
+  $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
+  $key = petitionssignatureform_variable_get('petitionssignatureform_api_key');
+  $allow_insecure = (bool) petitionssignatureform_variable_get('petitionssignatureform_allow_insecure');
 
   try {
     libraries_load(PETITIONSSIGNATUREFORM_SDK);

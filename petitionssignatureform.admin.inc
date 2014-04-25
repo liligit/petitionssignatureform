@@ -28,14 +28,14 @@ function petitionssignatureform_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('API endpoint'),
     '#description' => t('The absolute URL to the API endpoint for the Petitions site to submit signatures to, e.g., <code>http://example.com/v1</code>.'),
-    '#default_value' => variable_get('petitionssignatureform_api_endpoint'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_api_endpoint'),
     '#required' => TRUE,
   );
   $form['petitionssignatureform_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('API key'),
     '#description' => t('Your API key for the Petitions site, e.g., <code>95c0631b4986959bc0c22a5373c0e41f232dfab6</code>.'),
-    '#default_value' => variable_get('petitionssignatureform_api_key'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_api_key'),
     '#required' => TRUE,
   );
   $form['petitionssignatureform_allow_insecure'] = array(
@@ -44,20 +44,20 @@ function petitionssignatureform_admin_settings_form() {
     '#description' => t('Do not verify the peer or check for a common name in the peer certificate. Enable this to use SSL with a self-signed certificate, for example.<br /><strong>Warning:</strong> This setting has <a href="!url">security implications</a>. Do not enable it without understanding them.', array(
       '!url' => 'http://php.net/manual/function.curl-setopt.php',
     )),
-    '#default_value' => variable_get('petitionssignatureform_allow_insecure', 0),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_allow_insecure'),
   );
 
   $form['petitionssignatureform_thank_you_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Thank you title'),
-    '#descritiption' => t('Title above thank you message to display upon signature submission'),
-    '#default_value' => variable_get('petitionssignatureform_thank_you_title', ''),
+    '#descritiption' => t('Title above thank you message to display upon signature submission. No markup allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_title'),
   );
   $form['petitionssignatureform_thank_you_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Thank you message'),
-    '#descritiption' => t('Title above thank you message to display upon signature submission'),
-    '#default_value' => variable_get('petitionssignatureform_thank_you_message', ''),
+    '#descritiption' => t('The message to display upon signature submission. Some HTML allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_message'),
   );
 
   return system_settings_form($form);
