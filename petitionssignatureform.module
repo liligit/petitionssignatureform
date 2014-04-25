@@ -119,6 +119,11 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
   );
 
+  $form['ajax_prefix'] = array(
+    '#type' => 'item',
+    '#title' => '',
+    '#prefix' => '<div id="petitionsignatureform-ajax-replace">',
+  );
   $form['petition_id'] = array(
     '#type' => (isset($petition_id)) ? 'hidden' : 'textfield',
     '#title' => t('Petition ID'),
@@ -150,6 +155,12 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Sign Now'),
+    '#ajax' => array(
+      'callback' => 'petitionsignatureform_ajax_thank_you',
+      'wrapper' => 'petitionsignatureform-ajax-replace',
+      'method' => 'replace',
+      'effect' => 'fade',
+    ),
   );
 
   $form['sign_up'] = array(
@@ -157,7 +168,25 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#title' => t('Sign up for Updates'),
   );
 
+  $form['ajax_suffix'] = array(
+    '#type' => 'item',
+    '#title' => '',
+    '#suffix' => '</div>',
+  );
+
   return $form;
+}
+
+function petitionsignatureform_ajax_thank_you($form, $form_state) {
+  $title = variable_get('petitionssignatureform_thank_you_title', t('Email verification required'));
+  $message = variable_get('petitionssignatureform_thank_you_message', t('Thank you! Please check your email, and click the link there to validate.'));
+  
+  // @TODO replace this with a proper theme function.
+  $html = '';
+  $html .= '<h3>' . strtoupper($title) . '</h3>';
+  $html .= '<div>' . $message . '</div>';
+
+  return $html;
 }
 
 /**

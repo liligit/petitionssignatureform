@@ -46,6 +46,20 @@ function petitionssignatureform_admin_settings_form() {
     )),
     '#default_value' => variable_get('petitionssignatureform_allow_insecure', 0),
   );
+
+  $form['petitionssignatureform_thank_you_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Thank you title'),
+    '#descritiption' => t('Title above thank you message to display upon signature submission'),
+    '#default_value' => variable_get('petitionssignatureform_thank_you_title', ''),
+  );
+  $form['petitionssignatureform_thank_you_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Thank you title'),
+    '#descritiption' => t('Title above thank you message to display upon signature submission'),
+    '#default_value' => variable_get('petitionssignatureform_thank_you_message', ''),
+  );
+
   return system_settings_form($form);
 }
 
