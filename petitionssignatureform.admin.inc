@@ -41,22 +41,27 @@ function petitionssignatureform_admin_settings_form() {
   $form['petitionssignatureform_allow_insecure'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow insecure SSL.'),
-    '#description' => t('Do not verify the peer or check for a common name in the peer certificate. Enable this to use SSL with a self-signed certificate, for example.<br /><strong>Warning:</strong> This setting has <a href="!url">security implications</a>. Do not enable it without understanding them.', array(
+    '#description' => t('Do not verify the peer or check for a common name in the peer certificate. Enable this to use SSL with a self-signed certificate, for example.<br /><strong>Warning:</strong> This setting has <a href="!url">security implications</a>. Do not enable without understanding them.', array(
       '!url' => 'http://php.net/manual/function.curl-setopt.php',
     )),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_allow_insecure'),
   );
-
+  $form['petitionssignatureform_sign_up_field_label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('"Sign up" field label'),
+    '#description' => t('The text to use for the "Sign up" checkbox label. No markup allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label'),
+  );
   $form['petitionssignatureform_thank_you_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Thank you title'),
-    '#descritiption' => t('Title above thank you message to display upon signature submission. No markup allowed.'),
+    '#description' => t('The title to display above the thank you message upon signature submission. No markup allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_title'),
   );
   $form['petitionssignatureform_thank_you_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Thank you message'),
-    '#descritiption' => t('The message to display upon signature submission. Some HTML allowed.'),
+    '#description' => t('The message to display upon signature submission. Some basic HTML allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_message'),
   );
 

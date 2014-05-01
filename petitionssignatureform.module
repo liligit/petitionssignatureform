@@ -154,7 +154,7 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
 
   $form['sign_up'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Sign up for updates on this and other issues.'),
+    '#title' => check_plain(petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label')),
   );
 
   $form['submit'] = array(
@@ -272,6 +272,7 @@ function petitionssignatureform_variable_defaults() {
     'petitionssignatureform_api_key' => '',
     'petitionssignatureform_form_petition_id_argument_location' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH,
     'petitionssignatureform_form_petition_id_argument_type' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE,
+    'petitionssignatureform_sign_up_field_label' => t('Sign up for updates on this and other issues.'),
     'petitionssignatureform_thank_you_message' => t('<p>Check your inbox for an email from us and click on the link to verify your signature.</p>'),
     'petitionssignatureform_thank_you_title' => t('Email Verification Required'),
   );
@@ -417,8 +418,8 @@ function _petitionssignatureform_block_content() {
  *   The value from Drupal variable
  *   'petitionssignatureform_form_petition_id_argument_location'.
  *
- * @throws PetitionsPhpSdkResponseServerException
- *   If there is an error reaching the API.
+ * @return string|NULL
+ *   Returns a petition ID string, if one is found, or NULL if not.
  */
 function _petitionssignatureform_petition_id_from_api($arg_location) {
   global $base_url;
