@@ -454,7 +454,8 @@ function _petitionssignatureform_block_content() {
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH:
       // Get petition ID from read API.
-      $petition_id = _petitionssignatureform_petition_id_from_api($arg_location);
+      $petition = petitionssignatureform_get_petition($arg_location);
+      $petition_id = $petition->id;
       break;
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
@@ -489,16 +490,19 @@ function _petitionssignatureform_block_content() {
 }
 
 /**
- * Retrieves Petition ID from API call.
+ * Retrieves petition from API call.
  *
  * @param int $arg_location
  *   The value from Drupal variable
  *   'petitionssignatureform_form_petition_id_argument_location'.
  *
- * @return string|NULL
- *   Returns a petition ID string, if one is found, or NULL if not.
+ * @throws PetitionsPhpSdkResponseServerException
+ *   If there is an error reaching the API.
+ *
+ * @return obj
+ *   Petition object from Petitions PHP SDK.
  */
-function _petitionssignatureform_petition_id_from_api($arg_location) {
+function petitionssignatureform_get_petition($arg_location) {
   global $base_url;
   $petition_url = NULL;
 
@@ -524,7 +528,8 @@ function _petitionssignatureform_petition_id_from_api($arg_location) {
     $response = $connector->getPetitions(1, 0, array('url' => $petition_url));
     // Dig into the response to get the Petition ID.
     if (!empty($response->results[0]->id)) {
-      return $response->results[0]->id;
+      // Return item 0, petition.
+      return $response->results[0];
     }
     else {
       watchdog('petitionssignatureform', "Could not get a petition ID via the API.\n\nResponse: !response", array(
