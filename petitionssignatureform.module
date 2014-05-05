@@ -119,11 +119,9 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
   );
 
-  $form['ajax_prefix'] = array(
-    '#type' => 'item',
-    '#title' => '',
-    '#prefix' => '<div id="petitionsignatureform-ajax-replace">',
-  );
+  $form['#prefix'] = '<div id="formwrapper">';
+  $form['#suffix'] = '</div>';
+
   $form['petition_id'] = array(
     '#type' => (isset($petition_id)) ? 'hidden' : 'textfield',
     '#title' => t('Petition ID'),
@@ -136,16 +134,19 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#title' => t('First Name'),
     '#required' => TRUE,
   );
+
   $form['last_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Last Name'),
     '#required' => TRUE,
   );
+
   $form['email'] = array(
     '#type' => 'textfield',
     '#title' => t('Email Address'),
     '#required' => TRUE,
   );
+
   $form['zip_code'] = array(
     '#type' => 'textfield',
     '#title' => t('Zip Code'),
@@ -162,16 +163,10 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#value' => t('Sign Now'),
     '#ajax' => array(
       'callback' => 'petitionsignatureform_ajax_thank_you',
-      'wrapper' => 'petitionsignatureform-ajax-replace',
+      'wrapper' => 'formwrapper',
       'method' => 'replace',
       'effect' => 'fade',
     ),
-  );
-
-  $form['ajax_suffix'] = array(
-    '#type' => 'item',
-    '#title' => '',
-    '#suffix' => '</div>',
   );
 
   return $form;
@@ -183,6 +178,16 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
  * @see petitionssignatureform_signature_form()
  */
 function petitionsignatureform_ajax_thank_you($form, $form_state) {
+  // Validate the form.
+  drupal_validate_form('petitionssignatureform_signature_form', $form, $form_state);
+  // If there are errors, return the form to display the error messages.
+  if (form_get_errors()) {
+    $form_state['rebuild'] = TRUE;
+    // Clear the actual messages.
+    drupal_get_messages('error');
+    return $form;
+  }
+
   $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
   $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
 
