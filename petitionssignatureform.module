@@ -227,7 +227,16 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
     );
 
     $response = $connector->sendSignature($signature);
-    drupal_set_message(t('Your signature has been submitted.'));
+
+    if ($response->metadata->responseInfo->status == 200) {
+      drupal_set_message(t('Your signature has been submitted.'));
+    }
+    else {
+      drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
+      watchdog('petitionssignatureform', "Error submitting signature:\n\n!response", array(
+        '!response' => print_r($response, TRUE),
+      ), WATCHDOG_ERROR);
+    }
   }
   // A server exception signifies a problem with the target petitions site.
   catch (PetitionsPhpSdkResponseServerException $e) {
