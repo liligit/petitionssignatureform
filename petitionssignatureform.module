@@ -115,6 +115,16 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     throw new InvalidArgumentException('Invalid Petition ID.');
   }
 
+  $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
+  $key = petitionssignatureform_variable_get('petitionssignatureform_api_key');
+
+  if (empty($base) || empty($key)) {
+    $form['runtime_error'] = array(
+      '#markup' => t('Your form is not configured to connect to the Petitions API.'),
+    );
+    return $form;
+  }
+
   $form['#attached']['js'] = array(
     drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
   );
