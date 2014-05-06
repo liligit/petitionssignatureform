@@ -125,10 +125,6 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     return $form;
   }
 
-  $form['#attached']['js'] = array(
-    drupal_get_path('module', 'petitionssignatureform') . '/petitionssignatureform.js',
-  );
-
   $form['#prefix'] = '<div id="formwrapper">';
   $form['#suffix'] = '</div>';
 
