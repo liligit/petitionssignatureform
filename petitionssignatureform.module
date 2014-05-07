@@ -191,11 +191,15 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
 function petitionsignatureform_ajax_thank_you($form, $form_state) {
   // Validate the form.
   drupal_validate_form('petitionssignatureform_signature_form', $form, $form_state);
-  // If there are errors, return the form to display the error messages.
   if (form_get_errors()) {
     $form_state['rebuild'] = TRUE;
-    // Clear the actual messages.
+    // Prevent display of the error messages.
+    // @todo This will clobber ALL error messages--not just the expected form
+    //   validation error messages. A more sophisticated approach would probably
+    //   be preferable.
     drupal_get_messages('error');
+
+    // Return the form to display the error messages.
     return $form;
   }
 
