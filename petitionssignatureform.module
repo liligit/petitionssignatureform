@@ -462,8 +462,30 @@ function _petitionssignatureform_block_content() {
       // No petition identifier.
   }
 
-  $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
-  return drupal_render($form);
+  // If petition is signable, generate form.
+  $is_signable = (bool) $petition->isSignable;
+  if ($is_signable) {
+    $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
+    $output = drupal_render($form);
+  }
+  // If not, let user know petition is not accepting signatures.
+  else {
+    $signature_message = array(
+      '#type' => 'container',
+      '#attributes' => array(
+        'class' => array('signature-no-sign'),
+      ),
+      'content' => array(
+        '#type' => 'markup',
+        '#markup' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
+        '#weight' => 0,
+      ),
+    );
+
+    $output = drupal_render($signature_message);
+  }
+
+  return $output;
 }
 
 /**
