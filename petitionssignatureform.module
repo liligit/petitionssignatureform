@@ -441,6 +441,7 @@ function petitionssignatureform_block_view($delta = '') {
  */
 function _petitionssignatureform_block_content() {
   $petition_id = NULL;
+  $is_signable = NULL;
 
   // Get block settings.
   $arg_type = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_type');
@@ -456,6 +457,7 @@ function _petitionssignatureform_block_content() {
       // Get petition ID from read API.
       $petition = petitionssignatureform_get_petition($arg_location);
       $petition_id = $petition->id;
+      $is_signable = (bool) $petition->isSignable;
       break;
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
@@ -464,7 +466,6 @@ function _petitionssignatureform_block_content() {
   }
 
   // If petition is signable, generate form.
-  $is_signable = (bool) $petition->isSignable;
   if ($is_signable) {
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
     $output = drupal_render($form);
