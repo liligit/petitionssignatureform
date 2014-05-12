@@ -39,14 +39,6 @@ function petitionssignatureform_admin_settings_form() {
     '#required' => TRUE,
   );
 
-  $form['petitionssignatureform_no_signatures'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Message to appear when signing a petition is not possible.'),
-    '#description' => t('When a signature has a status that does not allow signing, this message will be presented to the user.'),
-    '#default_value' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
-    '#required' => FALSE,
-  );
-
   $form['petitionssignatureform_allow_insecure'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow insecure SSL.'),
@@ -54,6 +46,13 @@ function petitionssignatureform_admin_settings_form() {
       '!url' => 'http://php.net/manual/function.curl-setopt.php',
     )),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_allow_insecure'),
+  );
+  $form['petitionssignatureform_no_signatures'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Message to appear when signing a petition is not possible.'),
+    '#description' => t('When a signature has a status that does not allow signing, this message will be presented to the user.'),
+    '#default_value' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
+    '#required' => FALSE,
   );
   $form['petitionssignatureform_sign_up_field_label'] = array(
     '#type' => 'textfield',
