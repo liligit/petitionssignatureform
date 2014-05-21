@@ -39,6 +39,13 @@ function petitionssignatureform_admin_settings_form() {
     '#required' => TRUE,
   );
 
+  $form['petitionssignatureform_petitions_website_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Petitions website URL'),
+    '#default_value' =>
+    petitionssignatureform_variable_get('petitionssignatureform_petitions_website_url'),
+    '#required' => TRUE,
+  );
   $form['petitionssignatureform_allow_insecure'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow insecure SSL.'),
