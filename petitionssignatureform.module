@@ -450,6 +450,7 @@ function _petitionssignatureform_block_content() {
   $arg_location = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_location');
   // @todo Get settings here as they get implemented.
 
+  // Get $petition object.
   switch ($arg_type) {
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
       // @todo Implement method ID here.
@@ -458,8 +459,6 @@ function _petitionssignatureform_block_content() {
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH:
       // Get petition ID from read API.
       $petition = petitionssignatureform_get_petition($arg_location);
-      $petition_id = $petition->id;
-      $is_signable = (bool) $petition->isSignable;
       break;
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
@@ -467,15 +466,25 @@ function _petitionssignatureform_block_content() {
       // No petition identifier.
   }
 
-  // If petition is signable, generate form.
+  // If petition could not be retrieved. Our work here is done.
+  if (!$petition) {
+    return;
+  }
+
+  // Populate variables.
+  $petition_id = $petition->id;
+  $is_signable = (bool) $petition->isSignable;
+
+  // Generate block content.
   if ($is_signable) {
+    // If petition is signable, generate form.
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
-    // Set block content: Signature form.
     $block['content'] = $form;
     $block['subject'] = t('Sign this Petition');
   }
-  // If not, let user know petition is not accepting signatures.
   else {
+    // Petition is not signable, let user know petition is not accepting
+    // signatures (or display nothing if that's what admin configured).
     $content = array(
       '#type' => 'container',
       '#attributes' => array(
@@ -487,7 +496,6 @@ function _petitionssignatureform_block_content() {
         '#weight' => 0,
       ),
     );
-    // Set block content: Sorry, this petition isn't signable.
     $block['content'] = $content;
     $block['subject'] = variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
   }
