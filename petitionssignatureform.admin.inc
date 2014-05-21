@@ -39,11 +39,11 @@ function petitionssignatureform_admin_settings_form() {
   $form['api_settings']['petitionssignatureform_petitions_website_url'] = array(
     '#type' => 'textfield',
     '#title' => t('Petitions website URL'),
-    '#description' => t('This may be different from the API endpoint, for example: !petitions and !api.',
-        array('!petitions' => l('https://petitions.whitehouse.gov/', 'https://petitions.whitehouse.gov/'),
-              '!api' => l('http://api.whitehouse.gov/', 'http://api.whitehouse.gov/'))),
-    '#default_value' =>
-    petitionssignatureform_variable_get('petitionssignatureform_petitions_website_url'),
+    '#description' => t('This may be different from the API endpoint, e.g., <code>!petitions</code> and <code>!api</code>.', array(
+      '!petitions' => 'https://petitions.whitehouse.gov/',
+      '!api' => 'http://api.whitehouse.gov/',
+    )),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_petitions_website_url'),
     '#required' => TRUE,
   );
   $form['api_settings']['petitionssignatureform_api_key'] = array(
@@ -66,18 +66,17 @@ function petitionssignatureform_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Not accepting signatures'),
     '#collapsible' => TRUE,
+    '#description' => t('Set the interface text to display when the form points to a petition that is not accepting signatures.'),
   );
   $form['no_signatures']['petitionssignatureform_no_signatures_title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Title of the block that will appear when a petition is not open for signatures.'),
-    '#description' => t('When a petition is not open for signatures, this message will be presented to the user.'),
+    '#title' => t('Block title'),
     '#default_value' => variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed')),
     '#required' => FALSE,
   );
   $form['no_signatures']['petitionssignatureform_no_signatures'] = array(
     '#type' => 'textfield',
-    '#title' => t('Message to appear when petition is no longer accepting signatures.'),
-    '#description' => t('When a signature has a status that does not allow signing, this message will be presented to the user.'),
+    '#title' => t('Message text'),
     '#default_value' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
     '#required' => FALSE,
   );

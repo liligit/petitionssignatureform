@@ -327,10 +327,10 @@ function petitionssignatureform_variable_defaults() {
     'petitionssignatureform_api_key' => '',
     'petitionssignatureform_form_petition_id_argument_location' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH,
     'petitionssignatureform_form_petition_id_argument_type' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE,
+    'petitionssignatureform_petitions_website_url' => 'https://petitions.whitehouse.gov',
     'petitionssignatureform_sign_up_field_label' => t('Sign up for updates on this and other issues.'),
     'petitionssignatureform_thank_you_message' => t('<p>Check your inbox for an email from us and click on the link to verify your signature.</p>'),
     'petitionssignatureform_thank_you_title' => t('Email Verification Required'),
-    'petitionssignatureform_petitions_website_url' => 'https://petitions.whitehouse.gov',
   );
 }
 
@@ -437,7 +437,9 @@ function petitionssignatureform_block_view($delta = '') {
  * Block content generation function.
  *
  * @return array
- *   $block['subject'], string. $block['content'], a renderable array.
+ *   An associative array of block data containing the following items:
+ *   - "subject": The block title as a string.
+ *   - "content": A renderable array of block content.
  */
 function _petitionssignatureform_block_content() {
   $petition_id = NULL;
@@ -503,7 +505,7 @@ function _petitionssignatureform_block_content() {
  * @throws PetitionsPhpSdkResponseServerException
  *   If there is an error reaching the API.
  *
- * @return obj
+ * @return object
  *   Petition object from Petitions PHP SDK.
  */
 function petitionssignatureform_get_petition($arg_location) {
