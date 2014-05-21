@@ -468,12 +468,13 @@ function _petitionssignatureform_block_content() {
   // If petition is signable, generate form.
   if ($is_signable) {
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
-    $block['content'] = drupal_render($form);
+    // Set block content: Signature form.
+    $block['content'] = $form;
     $block['subject'] = t('Sign this Petition');
   }
   // If not, let user know petition is not accepting signatures.
   else {
-    $signature_message = array(
+    $content = array(
       '#type' => 'container',
       '#attributes' => array(
         'class' => array('signature-no-sign'),
@@ -484,8 +485,8 @@ function _petitionssignatureform_block_content() {
         '#weight' => 0,
       ),
     );
-
-    $block['content'] = drupal_render($signature_message);
+    // Set block content: Sorry, this petition isn't signable.
+    $block['content'] = $content;
     $block['subject'] = variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
   }
 
