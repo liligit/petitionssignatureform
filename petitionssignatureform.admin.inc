@@ -47,9 +47,16 @@ function petitionssignatureform_admin_settings_form() {
     )),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_allow_insecure'),
   );
+  $form['petitionssignatureform_no_signatures_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title of the block that will appear when a petition is not open for signatures.'),
+    '#description' => t('When a petition is not open for signatures, this message will be presented to the user.'),
+    '#default_value' => variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed')),
+    '#required' => FALSE,
+  );
   $form['petitionssignatureform_no_signatures'] = array(
     '#type' => 'textfield',
-    '#title' => t('Message to appear when signing a petition is not possible.'),
+    '#title' => t('Message to appear when petition is no longer accepting signatures.'),
     '#description' => t('When a signature has a status that does not allow signing, this message will be presented to the user.'),
     '#default_value' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
     '#required' => FALSE,

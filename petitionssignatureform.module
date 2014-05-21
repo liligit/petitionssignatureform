@@ -425,8 +425,7 @@ function petitionssignatureform_block_view($delta = '') {
 
   switch ($delta) {
     case 'petitionssignatureform_form':
-      $block['subject'] = t('Sign this Petition');
-      $block['content'] = _petitionssignatureform_block_content();
+      $block = _petitionssignatureform_block_content();
       break;
   }
 
@@ -437,7 +436,7 @@ function petitionssignatureform_block_view($delta = '') {
  * Block content generation function.
  *
  * @return array
- *   A renderable array.
+ *   $block['subject'], string. $block['content'], a renderable array.
  */
 function _petitionssignatureform_block_content() {
   $petition_id = NULL;
@@ -468,7 +467,8 @@ function _petitionssignatureform_block_content() {
   // If petition is signable, generate form.
   if ($is_signable) {
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
-    $output = drupal_render($form);
+    $block['content'] = drupal_render($form);
+    $block['subject'] = t('Sign this Petition');
   }
   // If not, let user know petition is not accepting signatures.
   else {
@@ -484,10 +484,11 @@ function _petitionssignatureform_block_content() {
       ),
     );
 
-    $output = drupal_render($signature_message);
+    $block['content'] = drupal_render($signature_message);
+    $block['subject'] = variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
   }
 
-  return $output;
+  return $block;
 }
 
 /**
