@@ -439,9 +439,11 @@ function petitionssignatureform_block_view($delta = '') {
  * Block content generation function.
  *
  * @return array
- *   An associative array of block data containing the following items:
+ *   If the target petition is successfully retrieved, an associative array of
+ *   block data containing the following items:
  *   - "subject": The block title as a string.
  *   - "content": A renderable array of block content.
+ *   Otherwise an empty array, to prevent the block from appearing.
  */
 function _petitionssignatureform_block_content() {
   $petition_id = NULL;
@@ -456,6 +458,7 @@ function _petitionssignatureform_block_content() {
   switch ($arg_type) {
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
       // @todo Implement method ID here.
+      $petition = NULL;
       break;
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH:
@@ -466,11 +469,12 @@ function _petitionssignatureform_block_content() {
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
     default:
       // No petition identifier.
+      $petition = NULL;
   }
 
   // If petition could not be retrieved. Our work here is done.
-  if (!$petition) {
-    return;
+  if (empty($petition) || !is_object($petition)) {
+    return array();
   }
 
   // Populate variables.
