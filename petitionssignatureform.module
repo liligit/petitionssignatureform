@@ -377,7 +377,8 @@ function petitionssignatureform_block_configure($delta = '') {
         '#type' => 'select',
         '#title' => t('Petition identifier to use'),
         '#options' => array(
-          // @todo Allow the selection of the Petition ID option when ready to implement.
+          // @todo Allow the selection of the Petition ID option when ready to
+          //   implement.
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE => t('None'),
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH => t('Petition path'),
@@ -389,7 +390,8 @@ function petitionssignatureform_block_configure($delta = '') {
         '#type' => 'select',
         '#title' => t('Location of the Petition identifier'),
         '#options' => array(
-          // @todo Allow the selection of the Petition arg() options when ready to implement.
+          // @todo Allow the selection of the Petition arg() options when ready
+          //   to implement.
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH => t('Use complete path'),
           // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
         ),
@@ -517,7 +519,6 @@ function _petitionssignatureform_block_content() {
  *   Petition object from Petitions PHP SDK.
  */
 function petitionssignatureform_get_petition($arg_location) {
-  global $base_url;
   $petition_url = NULL;
 
   switch ($arg_location) {
