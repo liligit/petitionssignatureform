@@ -472,14 +472,16 @@ function _petitionssignatureform_block_content() {
       $petition = NULL;
   }
 
-  // If petition could not be retrieved. Our work here is done.
+  // Petition could not be retrieved.
   if (empty($petition) || !is_object($petition)) {
-    return array();
+    $subject = t('Sorry');
+    $body = t('Could not generate signature form. Please contact an administrator.');
+    $petition = new stdClass();
   }
 
   // Populate variables.
-  $petition_id = $petition->id;
-  $is_signable = (bool) $petition->isSignable;
+  $petition_id = (property_exists($petition, 'id'))         ? $petition->id                : NULL;
+  $is_signable = (property_exists($petition, 'isSignable')) ? (bool) $petition->isSignable : FALSE;
 
   // Generate block content.
   if ($is_signable) {
@@ -491,6 +493,8 @@ function _petitionssignatureform_block_content() {
   else {
     // Petition is not signable, let user know petition is not accepting
     // signatures (or display nothing if that's what admin configured).
+    $subject = (isset($subject)) ? $subject : variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
+    $body = (isset($body)) ? $body : variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.'));
     $content = array(
       '#type' => 'container',
       '#attributes' => array(
@@ -498,12 +502,12 @@ function _petitionssignatureform_block_content() {
       ),
       'content' => array(
         '#type' => 'markup',
-        '#markup' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
+        '#markup' => $body,
         '#weight' => 0,
       ),
     );
     $block['content'] = $content;
-    $block['subject'] = variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
+    $block['subject'] = $subject;
   }
 
   return $block;
