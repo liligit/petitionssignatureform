@@ -480,7 +480,7 @@ function _petitionssignatureform_block_content() {
   }
 
   // Populate variables.
-  $petition_id = (property_exists($petition, 'id'))         ? $petition->id                : NULL;
+  $petition_id = (property_exists($petition, 'id')) ? $petition->id : NULL;
   $is_signable = (property_exists($petition, 'isSignable')) ? (bool) $petition->isSignable : FALSE;
 
   // Generate block content.
