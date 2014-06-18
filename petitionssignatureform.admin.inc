@@ -105,6 +105,37 @@ function petitionssignatureform_admin_settings_form() {
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_message'),
   );
 
+  $form['contact_administrator'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Contact administrator'),
+    '#collapsible' => TRUE,
+  );
+  $form['contact_administrator']['petitionssignatureform_contact_administrator_subject'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Subject'),
+    '#description' => t('The subject to display upon signature form failure.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject'),
+  );
+  $form['contact_administrator']['petitionssignatureform_contact_administrator_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Message'),
+    '#description' => t('The message to display upon signature form failure.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_message'),
+  );
+  $form['contact_administrator']['petitionssignatureform_contact_administrator_link'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Administrator form contact link'),
+    '#description' => t('The link to administrator form.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link'),
+  );
+  $form['contact_administrator']['petitionssignatureform_contact_administrator_link_text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Administrator form contact link text'),
+    '#description' => t('The link to administrator form text.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link_text'),
+  );
+
+
   return system_settings_form($form);
 }
 

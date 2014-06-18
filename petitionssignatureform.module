@@ -474,8 +474,14 @@ function _petitionssignatureform_block_content() {
 
   // Petition could not be retrieved.
   if (empty($petition) || !is_object($petition)) {
-    $subject = t('Sorry');
-    $body = t('Could not generate signature form. Please contact an administrator.');
+
+    $admin_page_url = petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link');
+    $admin_page_text = petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link_text');
+    $admin_page_link = l($admin_page_text, $admin_page_url);
+
+    $subject = t(petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject'));
+    $body = t(petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject') . ' '.
+    petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject') . '<br />' . $admin_page_link);
     $petition = new stdClass();
   }
 
