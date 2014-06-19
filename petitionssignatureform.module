@@ -325,10 +325,16 @@ function petitionssignatureform_variable_defaults() {
     'petitionssignatureform_allow_insecure' => FALSE,
     'petitionssignatureform_api_endpoint' => '',
     'petitionssignatureform_api_key' => '',
+    'petitionssignatureform_error_message' => t('Please contact an administrator.'),
+    'petitionssignatureform_error_title' => t('An error has occurred'),
     'petitionssignatureform_form_petition_id_argument_location' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH,
     'petitionssignatureform_form_petition_id_argument_type' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE,
+    'petitionssignatureform_no_signatures_message' => t('Sorry, this petition can not be signed.'),
+    'petitionssignatureform_no_signatures_title' => t('Petition Closed'),
     'petitionssignatureform_petitions_website_url' => 'https://petitions.whitehouse.gov',
     'petitionssignatureform_sign_up_field_label' => t('Sign up for updates on this and other issues.'),
+    'petitionssignatureform_submission_failed_message' => t('Sorry, there was a problem submitting your signature.'),
+    'petitionssignatureform_submission_failed_title' => t('Signature failed'),
     'petitionssignatureform_thank_you_message' => t('<p>Check your inbox for an email from us and click on the link to verify your signature.</p>'),
     'petitionssignatureform_thank_you_title' => t('Email Verification Required'),
   );
@@ -456,38 +462,29 @@ function _petitionssignatureform_block_content() {
 
   // Get $petition object.
   switch ($arg_type) {
-    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
-      // @todo Implement method ID here.
-      $petition = NULL;
-      break;
-
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH:
       // Get petition ID from read API.
       $petition = petitionssignatureform_get_petition($arg_location);
       break;
 
+    case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
+      // @todo Implement method ID here.
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
     default:
       // No petition identifier.
-      $petition = NULL;
-  }
-
-  // Petition could not be retrieved.
-  if (empty($petition) || !is_object($petition)) {
-
-    $admin_page_url = petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link');
-    $admin_page_text = petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link_text');
-    $admin_page_link = l($admin_page_text, $admin_page_url);
-
-    $subject = t(petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject'));
-    $body = t(petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject') . ' '.
-    petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject') . '<br />' . $admin_page_link);
-    $petition = new stdClass();
+      $petition = new stdClass();
   }
 
   // Populate variables.
   $petition_id = (property_exists($petition, 'id')) ? $petition->id : NULL;
+  $is_error = (bool) $petition_id;
   $is_signable = (property_exists($petition, 'isSignable')) ? (bool) $petition->isSignable : FALSE;
+
+  // Petition could not be retrieved.
+  if ($is_error) {
+    $subject = petitionssignatureform_variable_get('petitionssignatureform_error_title');
+    $body = petitionssignatureform_variable_get('petitionssignatureform_error_message');
+  }
 
   // Generate block content.
   if ($is_signable) {

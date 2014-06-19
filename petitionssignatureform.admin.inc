@@ -28,6 +28,7 @@ function petitionssignatureform_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('API settings'),
     '#collapsible' => TRUE,
+    '#collapsed' => petitionssignatureform_module_is_configured(),
   );
   $form['api_settings']['petitionssignatureform_api_endpoint'] = array(
     '#type' => 'textfield',
@@ -62,83 +63,106 @@ function petitionssignatureform_admin_settings_form() {
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_allow_insecure'),
   );
 
-  $form['no_signatures'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Not accepting signatures'),
-    '#collapsible' => TRUE,
-    '#description' => t('Set the interface text to display when the form points to a petition that is not accepting signatures.'),
+  $form['interface_text_title'] = array(
+    '#type' => 'item',
+    '#title' => t('User interface text'),
   );
-  $form['no_signatures']['petitionssignatureform_no_signatures_title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Block title'),
-    '#default_value' => variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed')),
-    '#required' => FALSE,
-  );
-  $form['no_signatures']['petitionssignatureform_no_signatures'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Message text'),
-    '#default_value' => variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.')),
-    '#required' => FALSE,
+  $form['interface_text'] = array(
+    '#type' => 'vertical_tabs',
   );
 
-  $form['accepting_signatures'] = array(
+  $form['interface_text']['accepting_signatures'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Accepting signatures'),
-    '#collapsible' => TRUE,
+    '#title' => t('Petition is accepting signatures'),
+    '#description' => t('The interface text to display when the form points at a petition that is accepting signatures.'),
   );
-  $form['accepting_signatures']['petitionssignatureform_sign_up_field_label'] = array(
+  $form['interface_text']['accepting_signatures']['petitionssignatureform_accepting_signatures_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Block title'),
+    '#description' => t('No markup allowed.'),
+    '#default_value' => variable_get('petitionssignatureform_accepting_signaturess_title', t('Petition Closed')),
+  );
+  $form['interface_text']['accepting_signatures']['petitionssignatureform_sign_up_field_label'] = array(
     '#type' => 'textfield',
     '#title' => t('"Sign up" field label'),
     '#description' => t('The text to use for the "Sign up" checkbox label. No markup allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label'),
   );
-  $form['accepting_signatures']['petitionssignatureform_thank_you_title'] = array(
+
+  $form['interface_text']['no_signatures'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Petition is not accepting signatures'),
+    '#description' => t('The interface text to display when the form points at a petition that is not accepting signatures.'),
+  );
+  $form['interface_text']['no_signatures']['petitionssignatureform_no_signatures_title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Thank you title'),
-    '#description' => t('The title to display above the thank you message upon signature submission. No markup allowed.'),
+    '#title' => t('Block title'),
+    '#description' => t('No markup allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed')),
+  );
+  $form['interface_text']['no_signatures']['petitionssignatureform_no_signatures_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Message text'),
+    '#description' => t('Some basic HTML allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_no_signatures_message'),
+  );
+
+  $form['interface_text']['form_error'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Form error'),
+    '#description' => t('The interface text to display when an error prevents the form from displaying.'),
+  );
+  $form['interface_text']['form_error']['petitionssignatureform_error_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Block title'),
+    '#description' => t('No markup allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_error_title'),
+  );
+  $form['interface_text']['form_error']['petitionssignatureform_error_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Message text'),
+    '#description' => t('Some basic HTML allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_error_message'),
+  );
+
+  $form['interface_text']['signature_submitted'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Signature successfully submitted'),
+    '#description' => t('The interface text to display when the form submits successfully.'),
+  );
+  $form['interface_text']['signature_submitted']['petitionssignatureform_thank_you_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Block title'),
+    '#description' => t('No markup allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_title'),
   );
-  $form['accepting_signatures']['petitionssignatureform_thank_you_message'] = array(
+  $form['interface_text']['signature_submitted']['petitionssignatureform_thank_you_message'] = array(
     '#type' => 'textarea',
-    '#title' => t('Thank you message'),
-    '#description' => t('The message to display upon signature submission. Some basic HTML allowed.'),
+    '#title' => t('Message text'),
+    '#description' => t('Some basic HTML allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_message'),
   );
 
-  $form['contact_administrator'] = array(
+  $form['interface_text']['submission_failed'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Contact administrator'),
-    '#collapsible' => TRUE,
+    '#title' => t('Signature submission failed'),
+    '#description' => t('The interface text to display when the form encounters an error submitting.'),
   );
-  $form['contact_administrator']['petitionssignatureform_contact_administrator_subject'] = array(
+  $form['interface_text']['submission_failed']['petitionssignatureform_submission_failed_title'] = array(
     '#type' => 'textfield',
-    '#title' => t('Subject'),
-    '#description' => t('The subject to display upon signature form failure.'),
-    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_subject'),
+    '#title' => t('Block title'),
+    '#description' => t('No markup allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_submission_failed_title'),
   );
-  $form['contact_administrator']['petitionssignatureform_contact_administrator_message'] = array(
+  $form['interface_text']['submission_failed']['petitionssignatureform_submission_failed_message'] = array(
     '#type' => 'textarea',
-    '#title' => t('Message'),
-    '#description' => t('The message to display upon signature form failure.'),
-    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_message'),
+    '#title' => t('Message text'),
+    '#description' => t('Some basic HTML allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_submission_failed_message'),
   );
-  $form['contact_administrator']['petitionssignatureform_contact_administrator_link'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Administrator form contact link'),
-    '#description' => t('The link to administrator form.'),
-    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link'),
-  );
-  $form['contact_administrator']['petitionssignatureform_contact_administrator_link_text'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Administrator form contact link text'),
-    '#description' => t('The link to administrator form text.'),
-    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_contact_administrator_link_text'),
-  );
-
 
   return system_settings_form($form);
 }
-
 
 /**
  * Form submission handler for petitionssignatureform_admin_settings_form().
