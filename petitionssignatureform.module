@@ -169,7 +169,12 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#title' => check_plain(petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label')),
   );
 
-  $form['prviacy'] = array(
+  $form['privacy_container'] = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('privacy-container')),
+  );
+
+  $form['privacy_container']['prviacy'] = array(
     '#markup' => petitionssignatureform_variable_get('petitionssignatureform_privacy'),
   );
 
@@ -184,7 +189,12 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     ),
   );
 
-  $form['note'] = array(
+  $form['note_container'] = array(
+    '#type' => 'container',
+    '#attributes' => array('class' => array('note-container')),
+  );
+
+  $form['note_container']['note'] = array(
     '#markup' => petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_note'),
   );
 
