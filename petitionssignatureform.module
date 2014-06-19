@@ -499,13 +499,13 @@ function _petitionssignatureform_block_content() {
     // If petition is signable, generate form.
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
     $block['content'] = drupal_render($form);
-    $block['subject'] = t('Sign this Petition');
+    $block['subject'] = check_plain(petitionssignatureform_variable_get('petitionssignatureform_accepting_signaturess_title'));
   }
   else {
     // Petition is not signable, let user know petition is not accepting
     // signatures (or display nothing if that's what admin configured).
-    $subject = (isset($subject)) ? $subject : variable_get('petitionssignatureform_no_signatures_title', t('Petition Closed'));
-    $body = (isset($body)) ? $body : variable_get('petitionssignatureform_no_signatures', t('Sorry, this petition can not be signed.'));
+    $subject = (isset($subject)) ? $subject : check_plain(petitionssignatureform_variable_get('petitionssignatureform_no_signatures_title'));
+    $body = (isset($body)) ? $body : petitionssignatureform_variable_get('petitionssignatureform_no_signatures_message');
     $content = array(
       '#type' => 'container',
       '#attributes' => array(
