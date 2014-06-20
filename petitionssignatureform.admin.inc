@@ -151,7 +151,7 @@ function petitionssignatureform_admin_settings_form() {
   $form['interface_text']['signature_submitted']['petitionssignatureform_thank_you_message'] = array(
     '#type' => 'textarea',
     '#title' => t('Message text'),
-    '#description' => t('Some basic HTML allowed. Use an H3 tag to make text red/bold. '),
+    '#description' => t('Some basic HTML allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_thank_you_message'),
   );
 
