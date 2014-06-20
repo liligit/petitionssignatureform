@@ -10,6 +10,6 @@
  */
 ?>
 <div class="thank-you">
-  <h3><?php print $title; ?></h3>
+  <h2><?php print $title; ?></h2>
   <p><?php print $message; ?></p>
 </div>
