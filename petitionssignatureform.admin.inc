@@ -80,7 +80,7 @@ function petitionssignatureform_admin_settings_form() {
     '#type' => 'textfield',
     '#title' => t('Block title'),
     '#description' => t('No markup allowed.'),
-    '#default_value' => variable_get('petitionssignatureform_accepting_signaturess_title', t('Petition Closed')),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_title'),
   );
   $form['interface_text']['accepting_signatures']['petitionssignatureform_sign_up_field_label'] = array(
     '#type' => 'textfield',
