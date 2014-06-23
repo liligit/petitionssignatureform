@@ -476,9 +476,9 @@ function _petitionssignatureform_block_content() {
   }
 
   // Populate variables.
-  $petition_id = !empty($petition->id) ? $petition->id : NULL;
-  $is_error = $petition_id ? FALSE : TRUE;
-  $is_signable = !empty($petition->isSignable) ? (bool) $petition->isSignable : FALSE;
+  $petition_id = (!empty($petition->id)) ? $petition->id : NULL;
+  $is_error = !$petition_id;
+  $is_signable = (!empty($petition->isSignable)) ? (bool) $petition->isSignable : FALSE;
 
   // Petition could not be retrieved.
   if ($is_error) {
