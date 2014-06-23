@@ -88,15 +88,15 @@ function petitionssignatureform_admin_settings_form() {
     '#description' => t('The text to use for the "Sign up" checkbox label. No markup allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label'),
   );
-  $form['interface_text']['accepting_signatures']['petitionssignatureform_privacy'] = array(
+  $form['interface_text']['accepting_signatures']['petitionssignatureform_accepting_signatures_privacy_message'] = array(
     '#type' => 'textarea',
-    '#title' => t('Terms and Privacy Statement'),
-    '#description' => t('A simple statement for acknowleding a Privacy Policy and Terms of Participation.. Some basic HTML allowed.'),
-    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_privacy'),
+    '#title' => t('Privacy policy/terms of service'),
+    '#description' => t('An optional statement of privacy policy or terms of service. Leave blank to omit. Some basic HTML allowed.'),
+    '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_privacy_message'),
   );
   $form['interface_text']['accepting_signatures']['petitionssignatureform_accepting_signatures_note'] = array(
     '#type' => 'textarea',
-    '#title' => t('Form Note'),
+    '#title' => t('Form note'),
     '#description' => t('A final notice to the user that displays at the bottom of the form. Some basic HTML allowed.'),
     '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_note'),
   );
