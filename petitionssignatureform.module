@@ -490,7 +490,7 @@ function _petitionssignatureform_block_content() {
   if ($is_signable) {
     // If petition is signable, generate form.
     $form = drupal_get_form('petitionssignatureform_signature_form', $petition_id);
-    $block['content'] = $form;
+    $block['content'] = drupal_render($form);
     $block['subject'] = t('Sign this Petition');
   }
   else {
