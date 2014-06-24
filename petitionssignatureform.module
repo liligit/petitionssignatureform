@@ -169,7 +169,7 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#title' => check_plain(petitionssignatureform_variable_get('petitionssignatureform_sign_up_field_label')),
   );
 
-  $privacy_message = petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_privacy_message');
+  $privacy_message = filter_xss_admin(petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_privacy_message'));
   if (!empty($privacy_message)) {
     $form['privacy_container'] = array(
       '#type' => 'container',
@@ -197,7 +197,7 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
   );
 
   $form['note_container']['note'] = array(
-    '#markup' => petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_note'),
+    '#markup' => filter_xss_admin(petitionssignatureform_variable_get('petitionssignatureform_accepting_signatures_note')),
   );
 
   return $form;
