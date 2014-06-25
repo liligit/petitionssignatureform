@@ -587,8 +587,11 @@ function petitionssignatureform_get_petition($arg_location) {
     }
   }
   catch (Exception $e) {
+    // If dblog is enabled use print_r for readability. If watchdog is writing
+    // to logs that get cut at the end of a line, print as json.
+    $print_function = (module_exists('dblog')) ? 'print_r' : 'json_encode';
     watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
+      '!exception' => $print_function($e, TRUE),
     ), WATCHDOG_ERROR);
   }
 }
