@@ -184,7 +184,7 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     '#type' => 'submit',
     '#value' => t('Sign Now'),
     '#ajax' => array(
-      'callback' => 'petitionsignatureform_ajax_thank_you',
+      'callback' => 'petitionsignatureform_ajax_submit',
       'wrapper' => 'formwrapper',
       'method' => 'replace',
       'effect' => 'fade',
@@ -204,27 +204,69 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
 }
 
 /**
- * Ajax callback for thank you message.
+ * The AJAX callback for the signature form submission.
  *
  * @see petitionssignatureform_signature_form()
  */
-function petitionsignatureform_ajax_thank_you($form, $form_state) {
+function petitionsignatureform_ajax_submit($form, $form_state) {
   // Validate the form.
   drupal_validate_form('petitionssignatureform_signature_form', $form, $form_state);
   if (form_get_errors()) {
-    $form_state['rebuild'] = TRUE;
     // Prevent display of the error messages.
     // @todo This will clobber ALL error messages--not just the expected form
     //   validation error messages. A more sophisticated approach would probably
     //   be preferable.
     drupal_get_messages('error');
 
-    // Return the form to display the error messages.
+    // Rebuild and return the form.
+    $form_state['rebuild'] = TRUE;
     return $form;
   }
 
-  $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
-  $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
+  // The submission passed validation. Post the signature.
+  $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
+  $key = petitionssignatureform_variable_get('petitionssignatureform_api_key');
+  $allow_insecure = (bool) petitionssignatureform_variable_get('petitionssignatureform_allow_insecure');
+  $success = FALSE;
+  try {
+    libraries_load(PETITIONSSIGNATUREFORM_SDK);
+    $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
+
+    $signature = array(
+      'petition_id' => $form_state['values']['petition_id'],
+      'first_name' => $form_state['values']['first_name'],
+      'last_name' => $form_state['values']['last_name'],
+      'zip' => $form_state['values']['zip_code'],
+      'email' => $form_state['values']['email'],
+      'signup' => $form_state['values']['sign_up'],
+    );
+
+    $response = $connector->sendSignature($signature);
+
+    // Test for failure.
+    if ($response->metadata->responseInfo->status !== 200) {
+      throw new Exception(t('Response: !response', array(
+        '!response' => print_r($response, TRUE),
+      )));
+    }
+
+    // All clear!
+    $success = TRUE;
+  }
+  catch (Exception $e) {
+    watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
+      '!exception' => formatforlog($e),
+    ), WATCHDOG_ERROR);
+  }
+
+  if ($success) {
+    $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
+    $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
+  }
+  else {
+    $title = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_title');
+    $message = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_message');
+  }
 
   return theme('petitionssignatureform_thank_you', array(
     'title' => check_plain($title),
@@ -241,56 +283,6 @@ function petitionssignatureform_signature_form_validate($form, &$form_state) {
   // Validate email address.
   if (!valid_email_address($form_state['values']['email'])) {
     form_set_error('email', 'Please enter a valid email address.');
-  }
-}
-
-/**
- * Form submission handler for petitionssignatureform_signature_form().
- *
- * @see petitionssignatureform_signature_form()
- */
-function petitionssignatureform_signature_form_submit($form, &$form_state) {
-  $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
-  $key = petitionssignatureform_variable_get('petitionssignatureform_api_key');
-  $allow_insecure = (bool) petitionssignatureform_variable_get('petitionssignatureform_allow_insecure');
-  try {
-    libraries_load(PETITIONSSIGNATUREFORM_SDK);
-    $connector = new PetitionsPhpSdkApiConnector($base, $key, $allow_insecure);
-
-    $signature = array(
-      'petition_id' => $form_state['values']['petition_id'],
-      'first_name' => $form_state['values']['first_name'],
-      'last_name' => $form_state['values']['last_name'],
-      'zip' => $form_state['values']['zip_code'],
-      'email' => $form_state['values']['email'],
-      'signup' => $form_state['values']['sign_up'],
-    );
-
-    $response = $connector->sendSignature($signature);
-
-    if ($response->metadata->responseInfo->status == 200) {
-      drupal_set_message(t('Your signature has been submitted.'));
-    }
-    else {
-      drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
-      watchdog('petitionssignatureform', "Error submitting signature:\n\n!response", array(
-        '!response' => formatforlog($response),
-      ), WATCHDOG_ERROR);
-    }
-  }
-  // A server exception signifies a problem with the target petitions site.
-  catch (PetitionsPhpSdkResponseServerException $e) {
-    drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
-    watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
-      '!exception' => formatforlog($e),
-    ), WATCHDOG_ERROR);
-  }
-  // Most other errors signify a problem with the local configuration.
-  catch (Exception $e) {
-    drupal_set_message(t('Your signature could not be submitted. Please contact a site administrator.'), 'error');
-    watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
-      '!exception' => formatforlog($e),
-    ), WATCHDOG_ERROR);
   }
 }
 
