@@ -274,7 +274,7 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
     else {
       drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
       watchdog('petitionssignatureform', "Error submitting signature:\n\n!response", array(
-        '!response' => print_r($response, TRUE),
+        '!response' => formatforlog($response),
       ), WATCHDOG_ERROR);
     }
   }
@@ -282,14 +282,14 @@ function petitionssignatureform_signature_form_submit($form, &$form_state) {
   catch (PetitionsPhpSdkResponseServerException $e) {
     drupal_set_message(t('Your signature can not be submitted at this time. Please try again later or contact a site administrator if the problem persists.'), 'error');
     watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
+      '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
   }
   // Most other errors signify a problem with the local configuration.
   catch (Exception $e) {
     drupal_set_message(t('Your signature could not be submitted. Please contact a site administrator.'), 'error');
     watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
+      '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
   }
 }
@@ -582,16 +582,13 @@ function petitionssignatureform_get_petition($arg_location) {
     }
     else {
       watchdog('petitionssignatureform', "Could not get a petition ID via the API.\n\nResponse: !response", array(
-        '!response' => print_r($response, TRUE),
+        '!response' => formatforlog($response),
       ), WATCHDOG_ERROR);
     }
   }
   catch (Exception $e) {
-    // If dblog is enabled use print_r for readability. If watchdog is writing
-    // to logs that get cut at the end of a line, print as json.
-    $print_function = (module_exists('dblog')) ? 'print_r' : 'json_encode';
     watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
-      '!exception' => $print_function($e, TRUE),
+      '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
   }
 }
