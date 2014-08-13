@@ -112,11 +112,13 @@ function petitionssignatureform_permission() {
 function petitionssignatureform_signature_form($form, &$form_state, $petition_id = NULL) {
   // Make sure the petition ID is valid if supplied.
   if (isset($petition_id) && (!is_string($petition_id) || !strlen($petition_id))) {
+    petitionssignatureform_log_event("petitionssignatureform.form_error", 'count', 1);
     throw new InvalidArgumentException('Invalid Petition ID.');
   }
 
   // Don't display the form if the module isn't properly configured.
   if (!petitionssignatureform_module_is_configured()) {
+    petitionssignatureform_log_event("petitionssignatureform.form_error", 'count', 1);
     $message = t('The petition signature form is not yet <a href="@url">configured</a>.', array(
       '@url' => url('admin/config/services/petitionssignatureform/configure'),
     ));
@@ -129,6 +131,8 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     $form['runtime_error'] = array('#markup' => $message);
     return $form;
   }
+
+  petitionssignatureform_log_event("petitionssignatureform.form_display", 'count', 1);
 
   $form['#prefix'] = '<div id="formwrapper">';
   $form['#suffix'] = '</div>';
@@ -217,6 +221,7 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
     //   validation error messages. A more sophisticated approach would probably
     //   be preferable.
     drupal_get_messages('error');
+    petitionssignatureform_log_event("petitionssignatureform.validation_error", 'count', 1);
 
     // Rebuild and return the form.
     $form_state['rebuild'] = TRUE;
@@ -260,10 +265,12 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
   }
 
   if ($success) {
+    petitionssignatureform_log_event("petitionssignatureform.submission", 'count', 1);
     $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
     $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
   }
   else {
+    petitionssignatureform_log_event("petitionssignatureform.form_error", 'count', 1);
     $title = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_title');
     $message = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_message');
   }
@@ -497,6 +504,7 @@ function _petitionssignatureform_block_content() {
 
   // Petition could not be retrieved.
   if ($is_error) {
+    petitionssignatureform_log_event("petitionssignatureform.form_error", 'count', 1);
     $subject = petitionssignatureform_variable_get('petitionssignatureform_error_title');
     $body = petitionssignatureform_variable_get('petitionssignatureform_error_message');
   }
@@ -582,5 +590,17 @@ function petitionssignatureform_get_petition($arg_location) {
     watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
       '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
+  }
+}
+
+/**
+ * Provides a simple wrapper function for the petitionslog_event function
+ *
+ * @see petitionslog_event()
+ */
+function petitionssignatureform_log_event($name, $type = 'count', $value = NULL) {
+  // Check for petitionslog_event function, if exists, log event
+  if (function_exists('petitionslog_event')) {
+    petitionslog_event($name, $type, $value);
   }
 }
