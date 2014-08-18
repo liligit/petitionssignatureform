@@ -110,6 +110,8 @@ function petitionssignatureform_permission() {
  *   If an invalid petition ID is supplied.
  */
 function petitionssignatureform_signature_form($form, &$form_state, $petition_id = NULL) {
+  petitionssignatureform_log_event('petitionssignatureform.form.displayed');
+
   // Make sure the petition ID is valid if supplied.
   if (isset($petition_id) && (!is_string($petition_id) || !strlen($petition_id))) {
     petitionssignatureform_log_event('petitionssignatureform.form.display_status.invalid_petition_id');
@@ -213,6 +215,8 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
  * @see petitionssignatureform_signature_form()
  */
 function petitionsignatureform_ajax_submit($form, $form_state) {
+  petitionssignatureform_log_event('petitionssignatureform.form.submitted');
+
   // Validate the form.
   drupal_validate_form('petitionssignatureform_signature_form', $form, $form_state);
   if (form_get_errors()) {
@@ -227,8 +231,6 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
     $form_state['rebuild'] = TRUE;
     return $form;
   }
-
-  petitionssignatureform_log_event('petitionssignatureform.form.submitted');
 
   // The submission passed validation. Post the signature.
   $base = petitionssignatureform_variable_get('petitionssignatureform_api_endpoint');
@@ -479,8 +481,6 @@ function _petitionssignatureform_block_content() {
   $petition_id = NULL;
   $is_signable = NULL;
 
-  petitionssignatureform_log_event('petitionssignatureform.form.displayed');
-
   // Get block settings.
   $arg_type = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_type');
   $arg_location = (int) petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_location');
@@ -599,11 +599,12 @@ function petitionssignatureform_get_petition($arg_location) {
 
 /**
  * Logs a system event.
- * 
- * Provides a wrapper function for the petitionslog_event function
+ *
+ * This function logs to the Petitions distribution's event logging facility if
+ * available.
  *
  * @param string $name
- *   The name of the value you want to log.
+ *   The name of the event you want to log.
  * @param string $type
  *   (optional) The type of metric to log--one of the following values
  *   corresponding to the
@@ -621,7 +622,6 @@ function petitionssignatureform_get_petition($arg_location) {
  * @see petitionslog_event()
  */
 function petitionssignatureform_log_event($name, $type = 'count', $value = NULL) {
-  // Check for petitionslog_event function, if exists, log event
   if (function_exists('petitionslog_event')) {
     petitionslog_event($name, $type, $value);
   }
