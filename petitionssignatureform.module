@@ -263,7 +263,7 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
     $success = TRUE;
   }
   catch (Exception $e) {
-    watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
+    watchdog('petitionssignatureform', "Error submitting signature: !exception", array(
       '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
   }
@@ -585,13 +585,13 @@ function petitionssignatureform_get_petition($arg_location) {
       return $response->results[0];
     }
     else {
-      watchdog('petitionssignatureform', "Could not get a petition ID via the API.\n\nResponse: !response", array(
+      watchdog('petitionssignatureform', "Could not get a petition ID via the API. Response: !response", array(
         '!response' => formatforlog($response),
       ), WATCHDOG_ERROR);
     }
   }
   catch (Exception $e) {
-    watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
+    watchdog('petitionssignatureform', "Error retrieving petition: !exception", array(
       '!exception' => formatforlog($e),
     ), WATCHDOG_ERROR);
   }
