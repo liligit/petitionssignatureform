@@ -264,7 +264,7 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
   }
   catch (Exception $e) {
     watchdog('petitionssignatureform', "Error submitting signature: !exception", array(
-      '!exception' => formatforlog($e),
+      '!exception' => petitionssignatureform_format_for_watchdog($e),
     ), WATCHDOG_ERROR);
   }
 
@@ -586,13 +586,13 @@ function petitionssignatureform_get_petition($arg_location) {
     }
     else {
       watchdog('petitionssignatureform', "Could not get a petition ID via the API. Response: !response", array(
-        '!response' => formatforlog($response),
+        '!response' => petitionssignatureform_format_for_watchdog($response),
       ), WATCHDOG_ERROR);
     }
   }
   catch (Exception $e) {
     watchdog('petitionssignatureform', "Error retrieving petition: !exception", array(
-      '!exception' => formatforlog($e),
+      '!exception' => petitionssignatureform_format_for_watchdog($e),
     ), WATCHDOG_ERROR);
   }
 }
@@ -622,7 +622,35 @@ function petitionssignatureform_get_petition($arg_location) {
  * @see petitionslog_event()
  */
 function petitionssignatureform_log_event($name, $type = 'count', $value = NULL) {
+  // If inside a Petitions site, use the Petitions logging facility.
   if (function_exists('petitionslog_event')) {
     petitionslog_event($name, $type, $value);
   }
+}
+
+/**
+ * Formats data for logging via watchdog.
+ *
+ * This function collapses data structures to a single line for compatibility
+ * with syslog, which truncates anything more. If run inside a Petitions site,
+ * it delegates to the distribution's more sophisticated facilities.
+ *
+ * @param mixed $data
+ *   An arbitrary array or object to be formatted readably for logging.
+ *
+ * @return string
+ *   The data formatted to send to watchdog.
+ *
+ * @see watchdog()
+ * @see petitionslog_format_for_watchdog()
+ */
+function petitionssignatureform_format_for_watchdog($data) {
+  // If inside a Petitions site, there is already a (more sophisticated)
+  // function for this.
+  if (function_exists('petitionslog_format_for_watchdog')) {
+    return petitionslog_format_for_watchdog($data);
+  }
+
+  // Use (compressed) JSON to get it all on a single line.
+  return json_encode($data);
 }

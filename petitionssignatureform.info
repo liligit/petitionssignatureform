@@ -2,6 +2,5 @@ name = Petitions Signature Form
 description = Provides a form for signing petitions.
 core = 7.x
 dependencies[] = libraries (>=2.x)
-dependencies[] = formatforlog
 package = Petitions
 configure = admin/config/services/petitionssignatureform
