@@ -110,13 +110,17 @@ function petitionssignatureform_permission() {
  *   If an invalid petition ID is supplied.
  */
 function petitionssignatureform_signature_form($form, &$form_state, $petition_id = NULL) {
+  petitionssignatureform_log_event('petitionssignatureform.form.displayed');
+
   // Make sure the petition ID is valid if supplied.
   if (isset($petition_id) && (!is_string($petition_id) || !strlen($petition_id))) {
+    petitionssignatureform_log_event('petitionssignatureform.form.display_status.invalid_petition_id');
     throw new InvalidArgumentException('Invalid Petition ID.');
   }
 
   // Don't display the form if the module isn't properly configured.
   if (!petitionssignatureform_module_is_configured()) {
+    petitionssignatureform_log_event('petitionssignatureform.form.display_status.configuration_error');
     $message = t('The petition signature form is not yet <a href="@url">configured</a>.', array(
       '@url' => url('admin/config/services/petitionssignatureform/configure'),
     ));
@@ -129,6 +133,8 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
     $form['runtime_error'] = array('#markup' => $message);
     return $form;
   }
+
+  petitionssignatureform_log_event('petitionssignatureform.form.display_status.ok');
 
   $form['#prefix'] = '<div id="formwrapper">';
   $form['#suffix'] = '</div>';
@@ -209,6 +215,8 @@ function petitionssignatureform_signature_form($form, &$form_state, $petition_id
  * @see petitionssignatureform_signature_form()
  */
 function petitionsignatureform_ajax_submit($form, $form_state) {
+  petitionssignatureform_log_event('petitionssignatureform.form.submitted');
+
   // Validate the form.
   drupal_validate_form('petitionssignatureform_signature_form', $form, $form_state);
   if (form_get_errors()) {
@@ -217,6 +225,7 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
     //   validation error messages. A more sophisticated approach would probably
     //   be preferable.
     drupal_get_messages('error');
+    petitionssignatureform_log_event('petitionssignatureform.form.submission_status.validation_error');
 
     // Rebuild and return the form.
     $form_state['rebuild'] = TRUE;
@@ -254,16 +263,18 @@ function petitionsignatureform_ajax_submit($form, $form_state) {
     $success = TRUE;
   }
   catch (Exception $e) {
-    watchdog('petitionssignatureform', "Error submitting signature:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
+    watchdog('petitionssignatureform', "Error submitting signature: !exception", array(
+      '!exception' => petitionssignatureform_format_for_watchdog($e),
     ), WATCHDOG_ERROR);
   }
 
   if ($success) {
+    petitionssignatureform_log_event('petitionssignatureform.form.submission_status.ok');
     $title = petitionssignatureform_variable_get('petitionssignatureform_thank_you_title');
     $message = petitionssignatureform_variable_get('petitionssignatureform_thank_you_message');
   }
   else {
+    petitionssignatureform_log_event('petitionssignatureform.form.submission_status.server_error');
     $title = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_title');
     $message = petitionssignatureform_variable_get('petitionssignatureform_submission_failed_message');
   }
@@ -497,6 +508,7 @@ function _petitionssignatureform_block_content() {
 
   // Petition could not be retrieved.
   if ($is_error) {
+    petitionssignatureform_log_event('petitionssignatureform.form.display_status.invalid_petition_id');
     $subject = petitionssignatureform_variable_get('petitionssignatureform_error_title');
     $body = petitionssignatureform_variable_get('petitionssignatureform_error_message');
   }
@@ -573,14 +585,72 @@ function petitionssignatureform_get_petition($arg_location) {
       return $response->results[0];
     }
     else {
-      watchdog('petitionssignatureform', "Could not get a petition ID via the API.\n\nResponse: !response", array(
-        '!response' => print_r($response, TRUE),
+      watchdog('petitionssignatureform', "Could not get a petition ID via the API. Response: !response", array(
+        '!response' => petitionssignatureform_format_for_watchdog($response),
       ), WATCHDOG_ERROR);
     }
   }
   catch (Exception $e) {
-    watchdog('petitionssignatureform', "Error retrieving petition:\n\n!exception", array(
-      '!exception' => print_r($e, TRUE),
+    watchdog('petitionssignatureform', "Error retrieving petition: !exception", array(
+      '!exception' => petitionssignatureform_format_for_watchdog($e),
     ), WATCHDOG_ERROR);
   }
+}
+
+/**
+ * Logs a system event.
+ *
+ * This function logs to the Petitions distribution's event logging facility if
+ * available.
+ *
+ * @param string $name
+ *   The name of the event you want to log.
+ * @param string $type
+ *   (optional) The type of metric to log--one of the following values
+ *   corresponding to the
+ *   @link https://github.com/etsy/statsd/blob/master/docs/metric_types.md StatsD Metric Types @endlink
+ *   :
+ *   - count: The corresponding value is a number by which to increment (or
+ *     decrement, if negative) a simple counter.
+ *   - gauge: The corresponding value is a single datum, which remains constant
+ *     until explicitly changed.
+ *   - set: The corresponding value is a value to add to a set of unique values.
+ *   - time: The corresponding value is a duration in milliseconds.
+ * @param int|null $value
+ *   (optional) The numeric value you wish to log. Defaults to NULL.
+ *
+ * @see petitionslog_event()
+ */
+function petitionssignatureform_log_event($name, $type = 'count', $value = NULL) {
+  // If inside a Petitions site, use the Petitions logging facility.
+  if (function_exists('petitionslog_event')) {
+    petitionslog_event($name, $type, $value);
+  }
+}
+
+/**
+ * Formats data for logging via watchdog.
+ *
+ * This function collapses data structures to a single line for compatibility
+ * with syslog, which truncates anything more. If run inside a Petitions site,
+ * it delegates to the distribution's more sophisticated facilities.
+ *
+ * @param mixed $data
+ *   An arbitrary array or object to be formatted readably for logging.
+ *
+ * @return string
+ *   The data formatted to send to watchdog.
+ *
+ * @see watchdog()
+ * @see petitionslog_format_for_watchdog()
+ */
+function petitionssignatureform_format_for_watchdog($data) {
+  // If inside a Petitions site, there is already a (more sophisticated)
+  // function for this.
+  if (function_exists('petitionslog_format_for_watchdog')) {
+    return petitionslog_format_for_watchdog($data);
+  }
+
+  // Use (compressed) JSON to get it all on a single line.
+  return json_encode($data);
 }
