@@ -357,7 +357,6 @@ function petitionssignatureform_variable_defaults() {
     'petitionssignatureform_form_petition_id_argument_type' => PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE,
     'petitionssignatureform_no_signatures_message' => t('Sorry, this petition can not be signed.'),
     'petitionssignatureform_no_signatures_title' => t('Petition Closed'),
-    'petitionssignatureform_petitions_website_url' => 'https://petitions.whitehouse.gov',
     'petitionssignatureform_sign_up_field_label' => t('Sign up for updates on this and other issues.'),
     'petitionssignatureform_submission_failed_message' => t('Sorry, there was a problem submitting your signature.'),
     'petitionssignatureform_submission_failed_title' => t('Signature failed'),
@@ -557,11 +556,12 @@ function _petitionssignatureform_block_content() {
  *   Petition object from Petitions PHP SDK.
  */
 function petitionssignatureform_get_petition($arg_location) {
+  global $base_url;
   $petition_url = NULL;
 
   switch ($arg_location) {
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_PATH:
-      $petition_url = petitionssignatureform_variable_get('petitionssignatureform_petitions_website_url') . '/' . $_GET['q'];
+      $petition_url = $base_url . request_uri();
       break;
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_LOCATION_ARG:
