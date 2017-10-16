@@ -411,7 +411,7 @@ function petitionssignatureform_block_configure($delta = '') {
           // @todo Allow the selection of the Petition ID option when ready to
           //   implement.
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE => t('None'),
-          // PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
+          PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID => t('Petition ID'),
           PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_PATH => t('Petition path'),
         ),
         '#default_value' => petitionssignatureform_variable_get('petitionssignatureform_form_petition_id_argument_type'),
@@ -494,6 +494,12 @@ function _petitionssignatureform_block_content() {
 
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_ID:
       // @todo Implement method ID here.
+      $node = menu_get_object();
+      $pid = $node->nid;
+      $petition = petitions_data_get_petition($pid);
+      $petition = (object) $petition;
+      break;
+
     case PETITIONSSIGNATUREFORM_FORM_PETITION_ID_ARGUMENT_TYPE_NONE:
     default:
       // No petition identifier.
